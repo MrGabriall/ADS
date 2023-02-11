@@ -24,62 +24,6 @@ public class UserRecord {
         this.regDate = regDate;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public String getRegDate() {
-        return regDate;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public void setRegDate(String regDate) {
-        this.regDate = regDate;
-    }
-
     @Override
     public String toString() {
         return "UserDto{" +
