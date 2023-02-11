@@ -5,44 +5,45 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.ads.entity.Image;
+import ru.skypro.ads.dto.UserRecord;
+import ru.skypro.ads.dto.password.NewPassword;
 import ru.skypro.ads.entity.User;
-import ru.skypro.ads.service.UserService;
-
-import java.io.IOException;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/users")
+@RequestMapping(value = "users")
 public class UserController {
-
+    /*
     private UserService userService;
     private UserController(UserService userService) {
         this.userService = userService;
     }
+     */
 
-
-    @PostMapping(path ="/set_password")
-    public ResponseEntity<?> setPassword(@PathVariable String currentPassword, @PathVariable String newPassword) {
+    @PostMapping(path ="/set_password",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<NewPassword> setPassword(@RequestBody NewPassword newPassword) {
         return null;
     }
 
-    @GetMapping(path = "/me/{id}")
-    public ResponseEntity<?> getUser(@PathVariable long id) {
+    @GetMapping(path = "/me/{id}",
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<UserRecord> getUser(@PathVariable long id) {
         return null;
     }
 
-    @PatchMapping(path = "/me")
-    public ResponseEntity<?> updateUser(@RequestBody User user) {
+    @PatchMapping(path = "/me",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Void> updateUser(@RequestBody UserRecord userRecord) {
         return null;
     }
 
-    @PostMapping(value = "/me/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadUserImage(@PathVariable Long id,
-                                               @RequestParam MultipartFile image) throws IOException {
-        //userService.uploadUserImage(id, image);
-        return ResponseEntity.ok().build();
+    @PatchMapping(path = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Void> updateUserImage(@RequestPart("MultipartFile") MultipartFile image) {
+        return null;
     }
 
 }
