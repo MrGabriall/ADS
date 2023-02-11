@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.dto.UserRecord;
 import ru.skypro.ads.dto.password.NewPassword;
-import ru.skypro.ads.entity.User;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController

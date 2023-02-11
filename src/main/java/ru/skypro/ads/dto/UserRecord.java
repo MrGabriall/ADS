@@ -2,8 +2,6 @@ package ru.skypro.ads.dto;
 
 import lombok.Data;
 
-import java.util.Objects;
-
 @Data
 public class UserRecord {
     private Long id;
