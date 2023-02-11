@@ -3,7 +3,7 @@ package ru.skypro.ads.entity;
 import javax.persistence.*;
 
 @Entity
-public class Photo {
+public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
