@@ -1,6 +1,8 @@
 package ru.skypro.ads.cotroller;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.dto.*;
 
 @CrossOrigin(value = "http://localhost:3000")
@@ -8,56 +10,67 @@ import ru.skypro.ads.dto.*;
 @RequestMapping("ads")
 public class AdsController {
 
-    @GetMapping()
+    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseWrapperAds getAds() {
         return new ResponseWrapperAds();
     }
 
-    @PostMapping()
-    public AdsRecord addAds(AdsRecord adsRecord) {
+    @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public AdsRecord addAds(@RequestBody CreateAdsReq adsReq, @RequestBody MultipartFile multipartFile) {
         return new AdsRecord();
     }
 
-    @GetMapping("/{ad_pk}/comments")
-    public ResponseWrapperComment getComments(@PathVariable String ad_pk) {
+    @GetMapping(value = "/{ad_pk}/comments",
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseWrapperComment getComments(@PathVariable("ad_pk") Integer adPk) {
         return new ResponseWrapperComment();
     }
 
-    @PostMapping("/{ad_pk}/comments")
-    public CommentRecord addComment(@PathVariable String ad_pk) {
+    @PostMapping(value = "/{ad_pk}/comments",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public CommentRecord addComments(@PathVariable("ad_pk") Integer adPk, @RequestBody CommentRecord commentRecord) {
         return new CommentRecord();
     }
 
-    @GetMapping("/{id}")
-    public FullAdsRecord getFullAds(@PathVariable String id) {
+    @GetMapping(value = "/{id}",
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public FullAdsRecord getFullAds(@PathVariable Integer id) {
         return new FullAdsRecord();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAds(@PathVariable String id) {
+    public void deleteAds(@PathVariable Integer id) {
     }
 
-    @PatchMapping("/{id}")
-    public AdsRecord updateAds(@PathVariable String id) {
+    @PatchMapping(value = "/{id}",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public AdsRecord updateAds(@PathVariable Integer id, @RequestBody CreateAdsReq createAdsReq) {
         return new AdsRecord();
     }
 
-    @GetMapping("/{ad_pk}/comments/{id}")
-    public CommentRecord getComment(@PathVariable String ad_pk, @PathVariable String id) {
+    @GetMapping(value = "/{ad_pk}/comments/{id}",
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public CommentRecord getComments(@PathVariable("ad_pk") Integer adPk, @PathVariable Integer id) {
         return new CommentRecord();
     }
 
     @DeleteMapping("/{ad_pk}/comments/{id}")
-    public void deleteAds(@PathVariable String ad_pk, @PathVariable String id) {
+    public void deleteComments(@PathVariable("ad_pk") Integer adPk, @PathVariable Integer id) {
     }
 
-    @PatchMapping("/{ad_pk}/comments/{id}")
-    public CommentRecord updateComment(@PathVariable String ad_pk, @PathVariable String id) {
+    @PatchMapping(value = "/{ad_pk}/comments/{id}",
+            produces = {MediaType.APPLICATION_JSON_VALUE},
+            consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public CommentRecord updateComments(@PathVariable("ad_pk") Integer adPk, @PathVariable Integer id, @RequestBody CommentRecord commentRecord) {
         return new CommentRecord();
     }
 
-    @GetMapping("/me")
-    public AdsRecord getAdsMe() {
-        return new AdsRecord();
+    @GetMapping(value = "/me",
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseWrapperAds getAdsMe(@RequestParam String userName) {
+        return new ResponseWrapperAds();
     }
 }
