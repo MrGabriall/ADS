@@ -3,16 +3,15 @@ package ru.skypro.ads.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "images")
-public class Image {
+@Table(name = "avatars")
+public class Avatar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "ads")
-    private Ads ads;
+    @Column(name = "userId")
+    private Long userId;
 
     @Column(name = "file")
     private String file;
