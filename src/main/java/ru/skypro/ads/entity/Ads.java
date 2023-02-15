@@ -1,19 +1,17 @@
 package ru.skypro.ads.entity;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
-@Table(name = "ads")
 public class Ads {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
-    @OneToMany
-    @JoinColumn(name = "images")
-    private List<Image> images;
+    @ManyToOne
+    @JoinColumn(name = "image")
+    private Image image;
 
     @Column(name = "title")
     private String title;
