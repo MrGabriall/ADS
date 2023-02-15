@@ -3,6 +3,7 @@ package ru.skypro.ads.entity;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "comments")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -10,16 +11,16 @@ public class Comment {
     private Integer id;
 
     @OneToOne
-    @JoinColumn(name = "authorId")
+    @JoinColumn(name = "author_id")
     private User authorId;
 
     @OneToOne
-    @JoinColumn(name = "adsId")
+    @JoinColumn(name = "ads_id")
     private Ads adsId;
 
     @Column(name = "text")
     private String text;
 
-    @Column(name = "createdAt")
+    @Column(name = "created_at")
     private String createdAt;
 }

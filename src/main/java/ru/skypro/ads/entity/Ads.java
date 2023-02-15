@@ -1,18 +1,29 @@
 package ru.skypro.ads.entity;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
+@Table(name = "ads")
+@RequiredArgsConstructor
+@Getter
+@Setter
 public class Ads {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-
-    @ManyToOne
-    @JoinColumn(name = "image")
-    private Image image;
-
+/*
+    @OneToMany
+    @ToString.Exclude
+    @JoinColumn(name = "images")
+    private List<Image> images;
+*/
     @Column(name = "title")
     private String title;
 

@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import ru.skypro.ads.entity.Avatar;
 
 @Repository
-public interface AvatarRepository extends JpaRepository<Integer, Avatar> {
+public interface AvatarRepository extends JpaRepository<Avatar, Integer> {
 }

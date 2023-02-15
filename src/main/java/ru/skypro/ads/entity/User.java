@@ -6,26 +6,36 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-    @Column(name = "firstName")
+
+    @Column(name = "first_name")
     private String firstName;
-    @Column(name = "lastName")
+
+    @Column(name = "last_name")
     private String lastName;
+
     @Column(name = "email")
     private String email;
+
     @Column(name = "phone")
     private String phone;
+
     @Column(name = "city")
     private String city;
-    @Column(name = "regDate")
+
+    @Column(name = "reg_date")
     private String regDate;
+
     @OneToOne
-    @JoinColumn(name = "avatar")
+    @JoinColumn(name = "avatar_id")
     private Avatar avatar;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
 

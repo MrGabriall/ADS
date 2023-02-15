@@ -1,58 +1,57 @@
 --liquibase formatted sql
 
 --changeSet eosreign:1
-drop table if exists images cascade;
-CREATE TABLE images
+CREATE TABLE avatars
 (
-    id           BIGSERIAL  NOT NULL PRIMARY KEY,
-    ads          INT8 REFERENCES ads (id),
+    id           SERIAL     NOT NULL PRIMARY KEY,
     file         TEXT       NOT NULL
 );
 
 --changeSet eosreign:2
-drop table if exists ads cascade;
-CREATE TABLE ads
-(
-    id           BIGSERIAL  NOT NULL PRIMARY KEY,
-    image        INT8 REFERENCES image (id),
-    title        TEXT       NOT NULL,
-    author_id    INT8 REFERENCES users (id),
-    description  TEXT       NOT NULL,
-    price        INT8       NOT NULL
-);
-
---changeSet eosreign:3
-drop table if exists avatars cascade;
-CREATE TABLE avatars
-(
-    id           BIGSERIAL  NOT NULL PRIMARY KEY,
-    user_id      INT8       NOT NULL,
-    file         TEXT       NOT NULL
-);
-
---changeSet eosreign:4
-drop table if exists comments cascade;
-CREATE TABLE comments
-(
-    id           BIGSERIAL  NOT NULL PRIMARY KEY,
-    author_id    INT8 REFERENCES users (id),
-    ads_id       INT8 REFERENCES ads (id),
-    text         TEXT       NOT NULL,
-    created_at   TEXT       NOT NULL
-);
-
---changeSet eosreign:5
-drop table if exists users cascade;
 CREATE TABLE users
 (
-    id           BIGSERIAL  NOT NULL PRIMARY KEY,
+    id           SERIAL     NOT NULL PRIMARY KEY,
     first_name   TEXT       NOT NULL,
-    second_name  TEXT       NOT NULL,
+    last_name    TEXT       NOT NULL,
     phone        TEXT       NOT NULL,
     email        TEXT       NOT NULL,
     city         TEXT       NOT NULL,
     reg_date     TEXT       NOT NULL,
-    avatar       INT8 REFERENCES avatar (id),
+    avatar_id    INT4       NOT NULL,
     role         TEXT       NOT NULL
 );
+
+--changeSet eosreign:3
+CREATE TABLE comments
+(
+    id           SERIAL     NOT NULL PRIMARY KEY,
+    author_id    INT4       NOT NULL,
+    ads_id       INT4       NOT NULL,
+    text         TEXT       NOT NULL,
+    created_at   TEXT       NOT NULL
+);
+
+--changeSet eosreign:4
+CREATE TABLE ads
+(
+    id           SERIAL     NOT NULL PRIMARY KEY,
+    --images       INT4       NOT NULL,
+    title        TEXT       NOT NULL,
+    author_id    INT4       NOT NULL,
+    description  TEXT       NOT NULL,
+    price        INT4       NOT NULL
+);
+
+--changeSet eosreign:5
+CREATE TABLE images
+(
+    id           SERIAL     NOT NULL PRIMARY KEY,
+    ads_id       INT4       NOT NULL,
+    file         TEXT       NOT NULL
+);
+
+
+
+
+
 
