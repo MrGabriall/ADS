@@ -18,12 +18,11 @@ public class Ads {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
-/*
-    @OneToMany
-    @ToString.Exclude
-    @JoinColumn(name = "images")
-    private List<Image> images;
-*/
+
+    @OneToOne
+    @JoinColumn(name = "image")
+    private Image image;
+
     @Column(name = "title")
     private String title;
 

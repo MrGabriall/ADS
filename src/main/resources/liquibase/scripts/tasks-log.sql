@@ -35,7 +35,7 @@ CREATE TABLE comments
 CREATE TABLE ads
 (
     id           SERIAL     NOT NULL PRIMARY KEY,
-    --images       INT4       NOT NULL,
+    image        INT4       NOT NULL,
     title        TEXT       NOT NULL,
     author_id    INT4       NOT NULL,
     description  TEXT       NOT NULL,
