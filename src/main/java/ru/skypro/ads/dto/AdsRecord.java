@@ -8,5 +8,5 @@ public class AdsRecord {
     private String title;
     private Integer price;
     private String image;
-    private String description;
+    private Integer author;
 }

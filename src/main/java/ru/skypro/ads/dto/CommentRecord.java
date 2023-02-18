@@ -8,5 +8,6 @@ public class CommentRecord {
     private String createdAt;
     private Integer pk;
     private String text;
+    private Integer adsId;
 
 }

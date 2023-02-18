@@ -50,6 +50,9 @@ CREATE TABLE images
     file         TEXT       NOT NULL
 );
 
+--changeSet mrgabriell:6
+ALTER TABLE users add column username text;
+ALTER TABLE users add column password text;
 
 
 
