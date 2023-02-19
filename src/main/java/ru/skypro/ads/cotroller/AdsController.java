@@ -16,8 +16,9 @@ public class AdsController {
     }
 
     @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE},
-            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public AdsRecord addAds(@RequestBody CreateAdsReq adsReq, @RequestBody MultipartFile multipartFile) {
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public AdsRecord addAds(@RequestPart(value = "properties") CreateAdsReq adsReq,
+                            @RequestPart("image") MultipartFile multipartFile) {
         return new AdsRecord();
     }
 
@@ -70,7 +71,7 @@ public class AdsController {
 
     @GetMapping(value = "/me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseWrapperAds getAdsMe(@RequestParam String userName) {
+    public ResponseWrapperAds getAdsMe() {
         return new ResponseWrapperAds();
     }
 }

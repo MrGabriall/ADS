@@ -12,8 +12,8 @@ public class ImageController {
 
     @PatchMapping(value = "/{id}",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
-            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public Byte[] updateAdsImage(@PathVariable String id, @RequestPart("image") MultipartFile image) {
-        return new Byte[0];
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public byte[] updateAdsImage(@PathVariable String id, @RequestPart("image") MultipartFile image) {
+        return new byte[0];
     }
 }

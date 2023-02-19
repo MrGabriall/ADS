@@ -13,12 +13,6 @@ import ru.skypro.ads.dto.password.NewPassword;
 @RequiredArgsConstructor
 @RequestMapping(value = "users")
 public class UserController {
-    /*
-    private UserService userService;
-    private UserController(UserService userService) {
-        this.userService = userService;
-    }
-     */
 
     @PostMapping(path ="/set_password",
             produces = {MediaType.APPLICATION_JSON_VALUE},
@@ -27,9 +21,9 @@ public class UserController {
         return null;
     }
 
-    @GetMapping(path = "/me/{id}",
+    @GetMapping(path = "/me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<UserRecord> getUser(@PathVariable long id) {
+    public ResponseEntity<UserRecord> getUser() {
         return null;
     }
 
@@ -41,7 +35,7 @@ public class UserController {
     }
 
     @PatchMapping(path = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Void> updateUserImage(@RequestPart("MultipartFile") MultipartFile image) {
+    public ResponseEntity<Void> updateUserImage(@RequestPart("image") MultipartFile image) {
         return null;
     }
 
