@@ -30,4 +30,12 @@ public class Comment {
 
     @Column(name = "created_at")
     private String createdAt;
+
+    public Comment(Integer id, User authorId, Ads adsId, String text, String createdAt) {
+        this.id = id;
+        this.authorId = authorId;
+        this.adsId = adsId;
+        this.text = text;
+        this.createdAt = createdAt;
+    }
 }
