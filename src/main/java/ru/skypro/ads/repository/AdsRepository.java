@@ -6,4 +6,5 @@ import ru.skypro.ads.entity.Ads;
 
 @Repository
 public interface AdsRepository extends JpaRepository<Ads, Integer> {
+    Ads findById();
 }

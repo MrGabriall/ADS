@@ -33,4 +33,13 @@ public class Ads {
 
     @Column(name = "price")
     private Integer price;
+
+    public Ads(Integer id, Image image, String title, User authorId, String description, Integer price) {
+        this.id = id;
+        this.image = image;
+        this.title = title;
+        this.authorId = authorId;
+        this.description = description;
+        this.price = price;
+    }
 }
