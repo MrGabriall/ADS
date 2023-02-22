@@ -2,6 +2,7 @@ package ru.skypro.ads.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import ru.skypro.ads.entity.Ads;
 import ru.skypro.ads.entity.Comment;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
     List<Comment> findAllById(Integer id);
 
-    Comment findCommentByAdsIdAndId(Integer adsId, Integer commentId);
+    Comment findCommentByAdsIdAndId(Ads adsId, Integer id);
 
-    boolean deleteByAdsIdAndId(Integer adsId, Integer commentId);
+    boolean deleteByAdsIdAndId(Ads adsId, Integer id);
 }

@@ -113,20 +113,20 @@ public class AdsService {
     }
     public CommentRecord getAdsComments(Integer adPk, Integer id) {
         logger.info("Completing method of getAdsComments()");
-        Comment comment = commentRepository.findCommentByAdsIdAndId(adPk, id);
+        Comment comment = commentRepository.findCommentByAdsIdAndId(adsRepository.findAdsById(adPk), id);
         logger.info("getAdsComments() is Complete");
         return recordMapper.toRecord(comment);
     }
 
     public boolean deleteComments(Integer adPk, Integer id) {
         logger.info("deleteComments() is Complete");
-        return commentRepository.deleteByAdsIdAndId(adPk, id);
+        return commentRepository.deleteByAdsIdAndId(adsRepository.findAdsById(adPk), id);
     }
 
     public CommentRecord updateComments(Integer adPk, Integer id, CommentRecord commentRecord) {
         logger.info("Completing method of updateComments()");
 
-        Comment oldComment = commentRepository.findCommentByAdsIdAndId(adPk, id);
+        Comment oldComment = commentRepository.findCommentByAdsIdAndId(adsRepository.findAdsById(adPk), id);
         Comment comment = recordMapper.toEntity(commentRecord);
         oldComment.setText(comment.getText());
         commentRepository.save(comment);
