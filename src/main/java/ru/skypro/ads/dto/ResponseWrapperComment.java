@@ -1,16 +1,18 @@
 package ru.skypro.ads.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ResponseWrapperComment {
+    @NonNull
     private Integer count;
+    @NonNull
     private List<CommentRecord> results;
-
-    public ResponseWrapperComment(Integer count, List<CommentRecord> results) {
-        this.count = count;
-        this.results = results;
-    }
 }

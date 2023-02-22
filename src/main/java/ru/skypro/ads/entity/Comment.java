@@ -1,16 +1,14 @@
 package ru.skypro.ads.entity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "comments")
-@RequiredArgsConstructor
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,12 +28,4 @@ public class Comment {
 
     @Column(name = "created_at")
     private String createdAt;
-
-    public Comment(Integer id, User authorId, Ads adsId, String text, String createdAt) {
-        this.id = id;
-        this.authorId = authorId;
-        this.adsId = adsId;
-        this.text = text;
-        this.createdAt = createdAt;
-    }
 }

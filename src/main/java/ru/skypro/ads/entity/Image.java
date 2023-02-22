@@ -1,16 +1,14 @@
 package ru.skypro.ads.entity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "images")
-@RequiredArgsConstructor
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

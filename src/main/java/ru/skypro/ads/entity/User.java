@@ -1,17 +1,15 @@
 package ru.skypro.ads.entity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.skypro.ads.dto.Role;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
-@RequiredArgsConstructor
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,16 +1,14 @@
 package ru.skypro.ads.entity;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "ads")
-@RequiredArgsConstructor
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class Ads {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,13 +31,4 @@ public class Ads {
 
     @Column(name = "price")
     private Integer price;
-
-    public Ads(Integer id, Image image, String title, User authorId, String description, Integer price) {
-        this.id = id;
-        this.image = image;
-        this.title = title;
-        this.authorId = authorId;
-        this.description = description;
-        this.price = price;
-    }
 }

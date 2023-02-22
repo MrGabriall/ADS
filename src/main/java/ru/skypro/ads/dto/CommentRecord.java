@@ -1,7 +1,11 @@
 package ru.skypro.ads.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class CommentRecord {
     private Integer author;
@@ -9,12 +13,4 @@ public class CommentRecord {
     private Integer pk;
     private String text;
     private Integer adsId;
-    
-    public CommentRecord(Integer pk, Integer author, Integer adsId, String text, String createdAt) {
-        this.pk = pk;
-        this.author = author;
-        this.adsId = adsId;
-        this.text = text;
-        this.createdAt = createdAt;
-    }
 }

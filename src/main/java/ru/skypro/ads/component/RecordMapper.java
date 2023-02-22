@@ -89,7 +89,6 @@ public class RecordMapper {
 
     public Ads toEntity(CreateAdsReq createAdsReq) {
         Ads ads = new Ads();
-        ads.setId(createAdsReq.getId());
         ads.setTitle(createAdsReq.getTitle());
         ads.setPrice(createAdsReq.getPrice());
         ads.setDescription(createAdsReq.getDescription());
@@ -125,5 +124,19 @@ public class RecordMapper {
         adsRecord.setImage(ads.getImage().getFile());
         adsRecord.setAuthor(ads.getAuthorId().getId());
         return adsRecord;
+    }
+
+    public FullAdsRecord toFullAdsRecord(Ads ads) {
+        FullAdsRecord fullAdsRecord = new FullAdsRecord();
+        fullAdsRecord.setPk(ads.getId());
+        fullAdsRecord.setTitle(ads.getTitle());
+        fullAdsRecord.setPrice(ads.getPrice());
+        fullAdsRecord.setImage(ads.getImage().getFile());
+        fullAdsRecord.setDescription(ads.getDescription());
+        fullAdsRecord.setAuthorFirstName(ads.getAuthorId().getFirstName());
+        fullAdsRecord.setAuthorLastName(ads.getAuthorId().getLastName());
+        fullAdsRecord.setPhone(ads.getAuthorId().getPhone());
+        fullAdsRecord.setEmail(ads.getAuthorId().getEmail());
+        return fullAdsRecord;
     }
 }
