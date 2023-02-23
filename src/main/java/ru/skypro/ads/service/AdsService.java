@@ -1,8 +1,11 @@
 package ru.skypro.ads.service;
 
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.component.RecordMapper;
@@ -20,7 +23,6 @@ import java.util.List;
 
 @Service
 public class AdsService {
-    Logger logger = LoggerFactory.getLogger(AdsService.class);
 
     private AdsRepository adsRepository;
     private CommentRepository commentRepository;
@@ -41,97 +43,77 @@ public class AdsService {
         this.imageRepository = imageRepository;
     }
 
-    public ResponseWrapperAds getAllAds() {
-        logger.info("Completing method of getAllAds()");
+    public ResponseEntity<ResponseWrapperAds> getAllAds() {
         List<AdsRecord> list = new ArrayList<>();
         List<Ads> listAds = adsRepository.findAll();
 
         for (int i = 0; i < listAds.size(); i++) {
             list.add(i, recordMapper.toRecord(listAds.get(i)));
         }
-        logger.info("getAllAds() is Complete");
-        return new ResponseWrapperAds(list.size(), list);
+        return new ResponseEntity<>(new ResponseWrapperAds(list.size(), list), HttpStatus.OK);
     }
 
-    public AdsRecord addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile) {
-        logger.info("Completing method of addAds()");
+    public ResponseEntity<AdsRecord> addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile) {
         Ads ads = recordMapper.toEntity(createAdsReq);
         //TODO как получить UserID
         //ads.setAuthorId();
         adsRepository.save(ads);
         ads.setImage(imageService.addImage(multipartFile));
-        logger.info("getAllAds() is Complete");
-        return recordMapper.toRecord(ads);
+        return new ResponseEntity<>(recordMapper.toRecord(ads), HttpStatus.OK);
 
     }
 
-    public ResponseWrapperComment getAllCommentsById(Integer id) {
-        logger.info("Completing method of getCommentsById()");
+    public ResponseEntity<ResponseWrapperComment> getAllCommentsById(Integer id) {
         List<CommentRecord> list = new ArrayList<>();
         List<Comment> listComments = commentRepository.findAllById(id);
 
         for (int i = 0; i < listComments.size(); i++) {
             list.add(i, recordMapper.toRecord(listComments.get(i)));
         }
-        logger.info("getCommentsById() is Complete");
-        return new ResponseWrapperComment(list.size(), list);
+        return new ResponseEntity<>(new ResponseWrapperComment(list.size(), list), HttpStatus.OK);
     }
 
-    public CommentRecord addComments(Integer adsId, CommentRecord commentRecord) {
-        logger.info("Completing method of addComments()");
+    public ResponseEntity<CommentRecord> addComments(Integer adsId, CommentRecord commentRecord) {
         Comment comment = recordMapper.toEntity(commentRecord);
         comment.setAdsId(adsRepository.findAdsById(adsId));
         commentRepository.save(comment);
-        logger.info("addComments() is Complete");
-        return commentRecord;
+        return new ResponseEntity<>(commentRecord, HttpStatus.OK);
     }
 
-    public FullAdsRecord getFullAds(Integer id) {
-        logger.info("Completing method of getFullAds()");
+    public ResponseEntity<FullAdsRecord> getFullAds(Integer id) {
         Ads ads = adsRepository.findAdsById(id);
-        logger.info("getFullAds() is Complete");
-        return recordMapper.toFullAdsRecord(ads);
+        return new ResponseEntity<>(recordMapper.toFullAdsRecord(ads), HttpStatus.OK);
     }
 
-    public void deleteAds(Integer id) {
-        logger.info("deleteAds() is Complete");
+    public ResponseEntity<Void> deleteAds(Integer id) {
         adsRepository.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    public AdsRecord updateAds(Integer id, CreateAdsReq createAdsReq) {
-        logger.info("Completing method of updateAds()");
+    public ResponseEntity<AdsRecord> updateAds(Integer id, CreateAdsReq createAdsReq) {
         Ads ads = adsRepository.findAdsById(id);
         Ads newAds = recordMapper.toEntity(createAdsReq);
-
         ads.setDescription(newAds.getDescription());
         ads.setPrice(newAds.getPrice());
         ads.setTitle(newAds.getTitle());
-
         adsRepository.save(ads);
-        logger.info("updateAds() is Complete");
-        return recordMapper.toRecord(ads);
+        return new ResponseEntity<>(recordMapper.toRecord(ads), HttpStatus.OK);
     }
-    public CommentRecord getAdsComments(Integer adPk, Integer id) {
-        logger.info("Completing method of getAdsComments()");
+    public ResponseEntity<CommentRecord> getAdsComments(Integer adPk, Integer id) {
         Comment comment = commentRepository.findCommentByAdsIdAndId(adPk, id);
-        logger.info("getAdsComments() is Complete");
-        return recordMapper.toRecord(comment);
+        return new ResponseEntity<>(recordMapper.toRecord(comment), HttpStatus.OK);
     }
 
     public boolean deleteComments(Integer adPk, Integer id) {
-        logger.info("deleteComments() is Complete");
         return commentRepository.deleteByAdsIdAndId(adPk, id);
     }
 
-    public CommentRecord updateComments(Integer adPk, Integer id, CommentRecord commentRecord) {
-        logger.info("Completing method of updateComments()");
-
+    public ResponseEntity<CommentRecord> updateComments(Integer adPk, Integer id, CommentRecord commentRecord) {
         Comment oldComment = commentRepository.findCommentByAdsIdAndId(adPk, id);
         Comment comment = recordMapper.toEntity(commentRecord);
         oldComment.setText(comment.getText());
         commentRepository.save(comment);
-        logger.info("updateComments() is Complete");
-        return commentRecord;
+        return new ResponseEntity<>(commentRecord, HttpStatus.OK);
     }
 
     public Pair<byte[], String> updateAdsImage(Integer idAds, MultipartFile image){
