@@ -20,7 +20,7 @@ public class RecordMapper {
         user.setPhone(userRecord.getPhone());
         if (userRecord.getImage() != null) {
             Avatar avatar = new Avatar();
-            avatar.setFile(userRecord.getImage());
+            avatar.setFilePath(userRecord.getImage());
             user.setAvatar(avatar);
         }
         return user;
@@ -46,7 +46,7 @@ public class RecordMapper {
         userRecord.setId(userRecord.getId());
 
         if (user.getAvatar() != null) {
-            userRecord.setImage(user.getAvatar().getFile());
+            userRecord.setImage(user.getAvatar().getFilePath());
         }
         if (user.getEmail() != null) {
             userRecord.setEmail(user.getEmail());
@@ -63,13 +63,13 @@ public class RecordMapper {
         if (commentRecord.getAdsId() != null) {
             Ads ads = new Ads();
             ads.setId(commentRecord.getAdsId());
-            comment.setAdsId(ads);
+            comment.setAds(ads);
         }
 
         if (commentRecord.getAuthor() != null) {
             User user = new User();
             user.setId(commentRecord.getAuthor());
-            comment.setAuthorId(user);
+            comment.setAuthor(user);
         }
 
         comment.setText(comment.getText());
@@ -80,8 +80,8 @@ public class RecordMapper {
     public CommentRecord toRecord(Comment comment) {
         CommentRecord commentRecord = new CommentRecord();
         commentRecord.setPk(comment.getId());
-        commentRecord.setAuthor(comment.getAuthorId().getId());
-        commentRecord.setAdsId(comment.getAdsId().getId());
+        commentRecord.setAuthor(comment.getAuthor().getId());
+        commentRecord.setAdsId(comment.getAds().getId());
         commentRecord.setText(comment.getText());
         commentRecord.setCreatedAt(comment.getCreatedAt());
         return commentRecord;
@@ -101,13 +101,13 @@ public class RecordMapper {
         if (adsRecord.getAuthor() != null) {
             User user = new User();
             user.setId(adsRecord.getAuthor());
-            ads.setAuthorId(user);
+            ads.setAuthor(user);
         }
 
         if (adsRecord.getImage() != null) {
             Image image = new Image();
-            image.setFile(adsRecord.getImage());
-            image.setAdsId(ads);
+            image.setFilePath(adsRecord.getImage());
+            image.setAds(ads);
             ads.setImage(image);
         }
 
@@ -121,8 +121,8 @@ public class RecordMapper {
         adsRecord.setPk(ads.getId());
         adsRecord.setTitle(ads.getTitle());
         adsRecord.setPrice(ads.getPrice());
-        adsRecord.setImage(ads.getImage().getFile());
-        adsRecord.setAuthor(ads.getAuthorId().getId());
+        adsRecord.setImage(ads.getImage().getFilePath());
+        adsRecord.setAuthor(ads.getAuthor().getId());
         return adsRecord;
     }
 
@@ -131,12 +131,12 @@ public class RecordMapper {
         fullAdsRecord.setPk(ads.getId());
         fullAdsRecord.setTitle(ads.getTitle());
         fullAdsRecord.setPrice(ads.getPrice());
-        fullAdsRecord.setImage(ads.getImage().getFile());
+        fullAdsRecord.setImage(ads.getImage().getFilePath());
         fullAdsRecord.setDescription(ads.getDescription());
-        fullAdsRecord.setAuthorFirstName(ads.getAuthorId().getFirstName());
-        fullAdsRecord.setAuthorLastName(ads.getAuthorId().getLastName());
-        fullAdsRecord.setPhone(ads.getAuthorId().getPhone());
-        fullAdsRecord.setEmail(ads.getAuthorId().getEmail());
+        fullAdsRecord.setAuthorFirstName(ads.getAuthor().getFirstName());
+        fullAdsRecord.setAuthorLastName(ads.getAuthor().getLastName());
+        fullAdsRecord.setPhone(ads.getAuthor().getPhone());
+        fullAdsRecord.setEmail(ads.getAuthor().getEmail());
         return fullAdsRecord;
     }
 }

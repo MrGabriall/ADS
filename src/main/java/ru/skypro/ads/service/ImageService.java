@@ -16,8 +16,8 @@ public class ImageService {
 
     @Value("${application.avatars}")
     private String imagesDir;
-    private ImageRepository imageRepository;
-    private ImageWriter imageWriter;
+    private final ImageRepository imageRepository;
+    private final ImageWriter imageWriter;
 
     public ImageService(ImageRepository imageRepository, ImageWriter imageWriter) {
         this.imageRepository = imageRepository;
@@ -34,12 +34,12 @@ public class ImageService {
 
     public Pair<byte[], String> getImageData(Image image) {
         checkImage(image);
-        return imageWriter.getImage(image.getFile());
+        return imageWriter.getImage(image.getFilePath());
     }
 
     public boolean deleteImage(Image image) {
         imageRepository.delete(image);
-        boolean isDeleted = imageWriter.deleteImage(Path.of(image.getFile()));
+        boolean isDeleted = imageWriter.deleteImage(Path.of(image.getFilePath()));
 
         if (isDeleted && imageRepository.findById(image.getId()).isEmpty()) {
             return true;
@@ -52,7 +52,7 @@ public class ImageService {
         Path path = imageWriter.writeImage(file, imagesDir);
 
         Image image = new Image();
-        image.setFile(path.toString());
+        image.setFilePath(path.toString());
         image = imageRepository.save(image);
         return image;
     }

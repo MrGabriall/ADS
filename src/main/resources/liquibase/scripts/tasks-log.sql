@@ -54,6 +54,14 @@ CREATE TABLE images
 ALTER TABLE users add column username text;
 ALTER TABLE users add column password text;
 
+--changeSEt mrgabriell:7
+ALTER TABLE ads rename column author_Id to author;
+ALTER TABLE avatars rename column file to file_path;
+ALTER TABLE comments rename column author_id to author;
+ALTER TABLE comments rename column ads_id to ads;
+ALTER TABLE users rename column avatar_id to avatar;
+ALTER TABLE images rename column ads_id to ads;
+ALTER TABLE images rename column file to file_path;
 
 
 

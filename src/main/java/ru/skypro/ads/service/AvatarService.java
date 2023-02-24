@@ -34,12 +34,12 @@ public class AvatarService {
 
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
         checkImage(avatar);
-        return imageWriter.getImage(avatar.getFile());
+        return imageWriter.getImage(avatar.getFilePath());
     }
 
     private boolean deleteAvatar(Avatar avatar) {
         avatarRepository.delete(avatar);
-        boolean isDeleted = imageWriter.deleteImage(Path.of(avatar.getFile()));
+        boolean isDeleted = imageWriter.deleteImage(Path.of(avatar.getFilePath()));
 
         if (isDeleted && avatarRepository.findById(avatar.getId()).isEmpty()) {
             return true;
@@ -52,7 +52,7 @@ public class AvatarService {
         Path path = imageWriter.writeImage(file, avatarsDir);
 
         Avatar avatar = new Avatar();
-        avatar.setFile(path.toString());
+        avatar.setFilePath(path.toString());
         avatar = avatarRepository.save(avatar);
         return avatar;
     }

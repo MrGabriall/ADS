@@ -40,7 +40,7 @@ public class User {
     private String password;
 
     @OneToOne
-    @JoinColumn(name = "avatar_id")
+    @JoinColumn(name = "avatar")
     private Avatar avatar;
 
     @Enumerated(EnumType.STRING)

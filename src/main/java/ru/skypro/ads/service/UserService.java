@@ -12,12 +12,14 @@ import ru.skypro.ads.entity.User;
 import ru.skypro.ads.repository.AvatarRepository;
 import ru.skypro.ads.repository.UserRepository;
 
+import java.time.LocalDate;
+
 @Service
 public class UserService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
     private User user;
-    private RecordMapper recordMapper;
-    private AvatarService avatarService;
+    private final RecordMapper recordMapper;
+    private final AvatarService avatarService;
     @Value("${application.basic-avatar}")
     private String basicAvatarPath;
     private final AvatarRepository avatarRepository;
@@ -32,17 +34,18 @@ public class UserService {
 
     private User getSingleUser(){
         if (user == null){
-            User user = new User();
-            user.setEmail("user@mail.ru");
-            user.setPassword("Password");
+            user = new User();
+            user.setEmail("user@gmail.com");
+            user.setPassword("password");
             user.setUserName("User");
             user.setPhone("+79881234567");
             user.setFirstName("Работяга");
             user.setLastName("Дефолтный");
             user.setRole(Role.USER);
             user.setCity("Сочи");
+            user.setRegDate(LocalDate.now().toString());
             Avatar avatar = new Avatar();
-            avatar.setFile(basicAvatarPath);
+            avatar.setFilePath(basicAvatarPath);
             avatarRepository.save(avatar);
             user.setAvatar(avatar);
             userRepository.save(user);

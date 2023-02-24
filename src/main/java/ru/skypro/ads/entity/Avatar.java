@@ -15,6 +15,6 @@ public class Avatar {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "file")
-    private String file;
+    @Column(name = "file_path")
+    private String filePath;
 }

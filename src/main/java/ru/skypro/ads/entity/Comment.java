@@ -16,12 +16,12 @@ public class Comment {
     private Integer id;
 
     @OneToOne
-    @JoinColumn(name = "author_id")
-    private User authorId;
+    @JoinColumn(name = "author")
+    private User author;
 
     @OneToOne
-    @JoinColumn(name = "ads_id")
-    private Ads adsId;
+    @JoinColumn(name = "ads")
+    private Ads ads;
 
     @Column(name = "text")
     private String text;

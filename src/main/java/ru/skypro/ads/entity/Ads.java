@@ -23,8 +23,8 @@ public class Ads {
     private String title;
 
     @ManyToOne
-    @JoinColumn(name = "authorId")
-    private User authorId;
+    @JoinColumn(name = "author")
+    private User author;
 
     @Column(name = "description")
     private String description;

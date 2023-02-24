@@ -1,8 +1,5 @@
 package ru.skypro.ads.service;
 
-import org.apache.coyote.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +21,11 @@ import java.util.List;
 @Service
 public class AdsService {
 
-    private AdsRepository adsRepository;
-    private CommentRepository commentRepository;
-    private UserRepository userRepository;
-    private RecordMapper recordMapper;
-    private ImageService imageService;
+    private final AdsRepository adsRepository;
+    private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
+    private final RecordMapper recordMapper;
+    private final ImageService imageService;
     private final ImageRepository imageRepository;
 
     private AdsService(AdsRepository adsRepository,
@@ -57,8 +54,8 @@ public class AdsService {
         Ads ads = recordMapper.toEntity(createAdsReq);
         //TODO как получить UserID
         //ads.setAuthorId();
-        adsRepository.save(ads);
         ads.setImage(imageService.addImage(multipartFile));
+        adsRepository.save(ads);
         return new ResponseEntity<>(recordMapper.toRecord(ads), HttpStatus.OK);
 
     }
@@ -75,7 +72,7 @@ public class AdsService {
 
     public ResponseEntity<CommentRecord> addComments(Integer adsId, CommentRecord commentRecord) {
         Comment comment = recordMapper.toEntity(commentRecord);
-        comment.setAdsId(adsRepository.findAdsById(adsId));
+        comment.setAds(adsRepository.findAdsById(adsId));
         commentRepository.save(comment);
         return new ResponseEntity<>(commentRecord, HttpStatus.OK);
     }
@@ -101,16 +98,19 @@ public class AdsService {
     }
 
     public ResponseEntity<CommentRecord> getAdsComments(Integer adPk, Integer id) {
-        Comment comment = commentRepository.findCommentByAdsIdAndId(adPk, id);
+        Ads ads = adsRepository.findAdsById(adPk);
+        Comment comment = commentRepository.findCommentByAdsAndId(ads, id);
         return new ResponseEntity<>(recordMapper.toRecord(comment), HttpStatus.OK);
     }
 
     public boolean deleteComments(Integer adPk, Integer id) {
-        return commentRepository.deleteByAdsIdAndId(adPk, id);
+        Ads ads = adsRepository.findAdsById(adPk);
+        return commentRepository.deleteByAdsAndId(ads, id);
     }
 
     public ResponseEntity<CommentRecord> updateComments(Integer adPk, Integer id, CommentRecord commentRecord) {
-        Comment oldComment = commentRepository.findCommentByAdsIdAndId(adPk, id);
+        Ads ads = adsRepository.findAdsById(adPk);
+        Comment oldComment = commentRepository.findCommentByAdsAndId(ads, id);
         Comment comment = recordMapper.toEntity(commentRecord);
         oldComment.setText(comment.getText());
         commentRepository.save(comment);

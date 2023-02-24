@@ -12,15 +12,11 @@ import ru.skypro.ads.service.UserService;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
-@RequiredArgsConstructor
 @RequestMapping(value = "users")
+@RequiredArgsConstructor
 public class UserController {
 
-    private UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final UserService userService;
 
     @PostMapping(path ="/set_password",
             produces = {MediaType.APPLICATION_JSON_VALUE},
@@ -33,15 +29,15 @@ public class UserController {
     @GetMapping(path = "/me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserRecord> getUser() {
-        return new ResponseEntity<>(userService.getUser(), HttpStatus.OK);
+        return ResponseEntity.ok(userService.getUser());
     }
 
     @PatchMapping(path = "/me",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Void> updateUser(@RequestBody UserRecord userRecord) {
+    public ResponseEntity<UserRecord> updateUser(@RequestBody UserRecord userRecord) {
         userService.updateUser(userRecord);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(userService.getUser(), HttpStatus.OK);
     }
 
     @PatchMapping(path = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

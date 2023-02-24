@@ -16,9 +16,9 @@ public class Image {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "ads_id")
-    private Ads adsId;
+    @JoinColumn(name = "ads")
+    private Ads ads;
 
-    @Column(name = "file")
-    private String file;
+    @Column(name = "file_path")
+    private String filePath;
 }
