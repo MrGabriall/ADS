@@ -99,6 +99,7 @@ public class AdsService {
         adsRepository.save(ads);
         return new ResponseEntity<>(recordMapper.toRecord(ads), HttpStatus.OK);
     }
+
     public ResponseEntity<CommentRecord> getAdsComments(Integer adPk, Integer id) {
         Comment comment = commentRepository.findCommentByAdsIdAndId(adPk, id);
         return new ResponseEntity<>(recordMapper.toRecord(comment), HttpStatus.OK);
