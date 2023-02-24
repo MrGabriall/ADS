@@ -93,12 +93,11 @@ public class AdsController {
     }
 
 
-    /*
     @GetMapping(value = "/me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseWrapperAds getAdsMe() {
-        return new ResponseWrapperAds();
+    public ResponseEntity<ResponseWrapperAds> getAdsMe() {
+        ResponseWrapperAds adsMe = adsService.getAdsMe();
+        return ResponseEntity.ok(adsMe);
     }
 
-     */
 }

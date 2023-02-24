@@ -27,17 +27,19 @@ public class AdsService {
     private final RecordMapper recordMapper;
     private final ImageService imageService;
     private final ImageRepository imageRepository;
+    private final UserService userService;
 
     private AdsService(AdsRepository adsRepository,
                        CommentRepository commentRepository,
                        UserRepository userRepository, RecordMapper recordMapper, ImageService imageService,
-                       ImageRepository imageRepository) {
+                       ImageRepository imageRepository, UserService userService) {
         this.adsRepository = adsRepository;
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.recordMapper = recordMapper;
         this.imageService = imageService;
         this.imageRepository = imageRepository;
+        this.userService = userService;
     }
 
     public ResponseEntity<ResponseWrapperAds> getAllAds() {
@@ -52,8 +54,8 @@ public class AdsService {
 
     public ResponseEntity<AdsRecord> addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile) {
         Ads ads = recordMapper.toEntity(createAdsReq);
-        //TODO как получить UserID
-        //ads.setAuthorId();
+        UserRecord user = userService.getUser();
+        ads.setAuthor(recordMapper.toEntity(user));
         ads.setImage(imageService.addImage(multipartFile));
         adsRepository.save(ads);
         return new ResponseEntity<>(recordMapper.toRecord(ads), HttpStatus.OK);
@@ -124,7 +126,14 @@ public class AdsService {
         return imageService.getImageData(newImage);
     }
 
-
+    public ResponseWrapperAds getAdsMe(){
+        List<AdsRecord> list = new ArrayList<>();
+        List<Ads> listAds = adsRepository.findAllByAuthor(recordMapper.toEntity(userService.getUser()));
+        for (int i = 0; i < listAds.size(); i++) {
+            list.add(i, recordMapper.toRecord(listAds.get(i)));
+        }
+        return new ResponseWrapperAds(list.size(), list);
+    }
 
 
 

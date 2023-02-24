@@ -49,10 +49,12 @@ public class UserService {
             avatarRepository.save(avatar);
             user.setAvatar(avatar);
             userRepository.save(user);
-            return user;
-        } else {
-            return user;
         }
+        return user;
+    }
+
+    public UserRecord getUser() {
+        return recordMapper.toRecord(getSingleUser());
     }
 
     public NewPassword setPassword(NewPassword newPassword){
@@ -62,10 +64,6 @@ public class UserService {
             userRepository.save(singleUser);
         }
         return newPassword;
-    }
-
-    public UserRecord getUser() {
-        return recordMapper.toRecord(getSingleUser());
     }
 
     public void updateUser(UserRecord userRecord){
