@@ -7,14 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.component.RecordMapper;
 import ru.skypro.ads.dto.*;
-import ru.skypro.ads.entity.Ads;
-import ru.skypro.ads.entity.Comment;
-import ru.skypro.ads.entity.Image;
+import ru.skypro.ads.entity.*;
 import ru.skypro.ads.repository.AdsRepository;
 import ru.skypro.ads.repository.CommentRepository;
 import ru.skypro.ads.repository.ImageRepository;
 import ru.skypro.ads.repository.UserRepository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,22 +41,27 @@ public class AdsService {
         this.userService = userService;
     }
 
-    public ResponseEntity<ResponseWrapperAds> getAllAds() {
-        List<AdsRecord> list = new ArrayList<>();
+    public ResponseWrapperAds getAllAds() {
         List<Ads> listAds = adsRepository.findAll();
+        List<AdsRecord> listAdsRecords = new ArrayList<>();
 
         for (int i = 0; i < listAds.size(); i++) {
-            list.add(i, recordMapper.toRecord(listAds.get(i)));
+            listAdsRecords.add(recordMapper.toRecord(listAds.get(i)));
         }
-        return new ResponseEntity<>(new ResponseWrapperAds(list.size(), list), HttpStatus.OK);
+        ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds(listAdsRecords.size(), listAdsRecords);
+        System.out.println(responseWrapperAds);
+        return responseWrapperAds;
     }
 
     public ResponseEntity<AdsRecord> addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile) {
         Ads ads = recordMapper.toEntity(createAdsReq);
+        System.out.println(ads);
         UserRecord user = userService.getUser();
         ads.setAuthor(recordMapper.toEntity(user));
-        ads.setImage(imageService.addImage(multipartFile));
-        adsRepository.save(ads);
+        //TODO придумать что-нибудь тут
+        ads = adsRepository.save(ads);
+        ads.setImage(imageService.addImage(ads, multipartFile));
+        ads = adsRepository.save(ads);
         return new ResponseEntity<>(recordMapper.toRecord(ads), HttpStatus.OK);
 
     }
@@ -122,13 +126,17 @@ public class AdsService {
     public Pair<byte[], String> updateAdsImage(Integer idAds, MultipartFile image){
         Ads ads = adsRepository.findAdsById(idAds);
         Image oldImage = imageRepository.findByAdsId(ads);
-        Image newImage = imageService.updateImage(oldImage, image);
+        Image newImage = imageService.updateImage(ads, oldImage, image);
         return imageService.getImageData(newImage);
     }
 
     public ResponseWrapperAds getAdsMe(){
         List<AdsRecord> list = new ArrayList<>();
-        List<Ads> listAds = adsRepository.findAllByAuthor(recordMapper.toEntity(userService.getUser()));
+
+        UserRecord userRecord = userService.getUser();
+        User user = recordMapper.toEntity(userRecord);
+
+        List<Ads> listAds = adsRepository.findAllByAuthor(user);
         for (int i = 0; i < listAds.size(); i++) {
             list.add(i, recordMapper.toRecord(listAds.get(i)));
         }

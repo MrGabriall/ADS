@@ -22,10 +22,7 @@ public class Ads {
     @Column(name = "title")
     private String title;
 
-    @ManyToOne(cascade = {
-            CascadeType.PERSIST,
-            CascadeType.MERGE
-    })
+    @ManyToOne
     @JoinColumn(name = "author")
     private User author;
 

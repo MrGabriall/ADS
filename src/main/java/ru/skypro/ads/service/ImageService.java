@@ -5,6 +5,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.component.ImageWriter;
+import ru.skypro.ads.entity.Ads;
 import ru.skypro.ads.entity.Image;
 import ru.skypro.ads.exception.ImageNotFoundException;
 import ru.skypro.ads.repository.ImageRepository;
@@ -24,11 +25,11 @@ public class ImageService {
         this.imageWriter = imageWriter;
     }
 
-    public Image updateImage(Image image, MultipartFile file) {
+    public Image updateImage(Ads ads, Image image, MultipartFile file) {
         checkImage(image);
 
         if (deleteImage(image)) {
-            return addImage(file);
+            return addImage(ads, file);
         } else return image;
     }
 
@@ -48,11 +49,12 @@ public class ImageService {
         }
     }
 
-    public Image addImage(MultipartFile file) {
+    public Image addImage(Ads ads, MultipartFile file) {
         Path path = imageWriter.writeImage(file, imagesDir);
 
         Image image = new Image();
         image.setFilePath(path.toString());
+        image.setAds(ads);
         image = imageRepository.save(image);
         return image;
     }

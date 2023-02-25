@@ -20,13 +20,13 @@ public class AdsController {
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseWrapperAds> getAds() {
-        return adsService.getAllAds();
+        return ResponseEntity.ok(adsService.getAllAds());
     }
 
     @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<AdsRecord> addAds(@RequestPart(value = "properties") CreateAdsReq createAdsReq,
-                            @RequestPart("image") MultipartFile multipartFile) {
+                                            @RequestPart("image") MultipartFile multipartFile) {
         return adsService.addAds(createAdsReq, multipartFile);
     }
 
@@ -40,7 +40,7 @@ public class AdsController {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<CommentRecord> addComments(@PathVariable("ad_pk") Integer adPk,
-                                     @RequestBody CommentRecord commentRecord) {
+                                                     @RequestBody CommentRecord commentRecord) {
         return adsService.addComments(adPk, commentRecord);
     }
 
@@ -59,20 +59,20 @@ public class AdsController {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<AdsRecord> updateAds(@PathVariable Integer id,
-                               @RequestBody CreateAdsReq createAdsReq) {
+                                               @RequestBody CreateAdsReq createAdsReq) {
         return adsService.updateAds(id, createAdsReq);
     }
 
     @GetMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<CommentRecord> getComments(@PathVariable("ad_pk") Integer adPk,
-                                     @PathVariable Integer id) {
+                                                     @PathVariable Integer id) {
         return adsService.getAdsComments(adPk, id);
     }
 
     @DeleteMapping("/{ad_pk}/comments/{id}")
     public ResponseEntity<Void> deleteComments(@PathVariable("ad_pk") Integer adPk,
-                                            @PathVariable Integer id) {
+                                               @PathVariable Integer id) {
         Boolean isDeleted = adsService.deleteComments(adPk, id);
 
         if (isDeleted) {

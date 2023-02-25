@@ -15,5 +15,5 @@ public class UserRecord {
     private String email;
     private String city;
     private String regDate;
-    private String image;
+    private String avatarPath;
 }

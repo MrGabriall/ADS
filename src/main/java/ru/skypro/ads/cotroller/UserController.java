@@ -36,8 +36,7 @@ public class UserController {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<UserRecord> updateUser(@RequestBody UserRecord userRecord) {
-        userService.updateUser(userRecord);
-        return new ResponseEntity<>(userService.getUser(), HttpStatus.OK);
+        return new ResponseEntity<>(userService.updateUser(userRecord), HttpStatus.OK);
     }
 
     @PatchMapping(path = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

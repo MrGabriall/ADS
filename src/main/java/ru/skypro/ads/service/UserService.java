@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private User user;
+    private static User user;
     private final RecordMapper recordMapper;
     private final AvatarService avatarService;
     @Value("${application.basic-avatar}")
@@ -35,22 +35,26 @@ public class UserService {
     private User getSingleUser(){
         if (user == null){
             user = new User();
-            user.setEmail("user@gmail.com");
-            user.setPassword("password");
-            user.setUserName("User");
-            user.setPhone("+79881234567");
+            user.setId(1);
             user.setFirstName("Работяга");
             user.setLastName("Дефолтный");
-            user.setRole(Role.USER);
+            user.setEmail("user@gmail.com");
+            user.setPhone("+79881234567");
             user.setCity("Сочи");
             user.setRegDate(LocalDate.now().toString());
+            user.setUserName("User");
+            user.setPassword("password");
             Avatar avatar = new Avatar();
             avatar.setFilePath(basicAvatarPath);
-            avatarRepository.save(avatar);
+            avatar = avatarRepository.save(avatar);
             user.setAvatar(avatar);
-            userRepository.save(user);
+            user.setRole(Role.ADMIN);
+            user = userRepository.save(user);
+            System.out.println("ИНИЦИАЛИЗАЦИЯ И ID" + user.getId() +
+                    "\n " + user.getRegDate() + " \n" + user.getAvatar().getFilePath());
         }
         return user;
+
     }
 
     public UserRecord getUser() {
@@ -66,15 +70,14 @@ public class UserService {
         return newPassword;
     }
 
-    public void updateUser(UserRecord userRecord){
+    public UserRecord updateUser(UserRecord userRecord){
         User userEntity = recordMapper.toEntity(userRecord);
         User currentUser = getSingleUser();
-        currentUser.setEmail(userEntity.getEmail());
         currentUser.setFirstName(userEntity.getFirstName());
         currentUser.setLastName(userEntity.getLastName());
         currentUser.setPhone(userEntity.getPhone());
-        currentUser.setCity(userEntity.getCity());
-        userRepository.save(currentUser);
+        user = userRepository.save(currentUser);
+        return recordMapper.toRecord(user);
     }
 
     public void updateUserImage(MultipartFile image){

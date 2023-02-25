@@ -11,16 +11,16 @@ public class RecordMapper {
 
     public User toEntity(UserRecord userRecord) {
         User user = new User();
+        user.setId(userRecord.getId());
         user.setFirstName(userRecord.getFirstName());
         user.setLastName(userRecord.getLastName());
-        user.setCity(userRecord.getCity());
         user.setEmail(userRecord.getEmail());
-        //TODO уточнить необходимость этого сета
-        user.setRegDate(userRecord.getRegDate());
         user.setPhone(userRecord.getPhone());
-        if (userRecord.getImage() != null) {
+        user.setCity(userRecord.getCity());
+        user.setRegDate(userRecord.getRegDate());
+        if (userRecord.getAvatarPath() != null) {
             Avatar avatar = new Avatar();
-            avatar.setFilePath(userRecord.getImage());
+            avatar.setFilePath(userRecord.getAvatarPath());
             user.setAvatar(avatar);
         }
         return user;
@@ -39,14 +39,14 @@ public class RecordMapper {
 
     public UserRecord toRecord(User user) {
         UserRecord userRecord = new UserRecord();
-        userRecord.setFirstName(userRecord.getFirstName());
-        userRecord.setLastName(userRecord.getLastName());
-        userRecord.setPhone(userRecord.getPhone());
-        userRecord.setRegDate(userRecord.getRegDate());
-        userRecord.setId(userRecord.getId());
+        userRecord.setId(user.getId());
+        userRecord.setFirstName(user.getFirstName());
+        userRecord.setLastName(user.getLastName());
+        userRecord.setPhone(user.getPhone());
+        userRecord.setRegDate(user.getRegDate());
 
         if (user.getAvatar() != null) {
-            userRecord.setImage(user.getAvatar().getFilePath());
+            userRecord.setAvatarPath(user.getAvatar().getFilePath());
         }
         if (user.getEmail() != null) {
             userRecord.setEmail(user.getEmail());
@@ -54,6 +54,7 @@ public class RecordMapper {
         if (user.getCity() != null) {
             userRecord.setCity(user.getCity());
         }
+        System.out.println("USER RECORD INFO :" + userRecord);
         return userRecord;
     }
 
