@@ -7,13 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.component.RecordMapper;
 import ru.skypro.ads.dto.*;
-import ru.skypro.ads.entity.*;
+import ru.skypro.ads.entity.Ads;
+import ru.skypro.ads.entity.Comment;
+import ru.skypro.ads.entity.Image;
+import ru.skypro.ads.entity.User;
 import ru.skypro.ads.repository.AdsRepository;
 import ru.skypro.ads.repository.CommentRepository;
 import ru.skypro.ads.repository.ImageRepository;
 import ru.skypro.ads.repository.UserRepository;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,14 +125,14 @@ public class AdsService {
         return new ResponseEntity<>(commentRecord, HttpStatus.OK);
     }
 
-    public Pair<byte[], String> updateAdsImage(Integer idAds, MultipartFile image){
+    public Pair<byte[], String> updateAdsImage(Integer idAds, MultipartFile image) {
         Ads ads = adsRepository.findAdsById(idAds);
         Image oldImage = imageRepository.findByAdsId(ads);
         Image newImage = imageService.updateImage(ads, oldImage, image);
         return imageService.getImageData(newImage);
     }
 
-    public ResponseWrapperAds getAdsMe(){
+    public ResponseWrapperAds getAdsMe() {
         List<AdsRecord> list = new ArrayList<>();
 
         UserRecord userRecord = userService.getUser();
@@ -143,7 +145,9 @@ public class AdsService {
         return new ResponseWrapperAds(list.size(), list);
     }
 
-
-
+    public Pair<byte[], String> getAdsByUniqueId(Integer uniqId){
+        Image image = imageRepository.getReferenceById(uniqId);
+        return imageService.getImageData(image);
+    }
 
 }

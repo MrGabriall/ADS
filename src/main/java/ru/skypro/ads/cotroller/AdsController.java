@@ -1,5 +1,6 @@
 package ru.skypro.ads.cotroller;
 
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +11,10 @@ import ru.skypro.ads.service.AdsService;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
-@RequestMapping("ads")
+@RequestMapping("/ads")
 public class AdsController {
     private AdsService adsService;
+
 
     private AdsController(AdsService adsService) {
         this.adsService = adsService;
@@ -99,5 +101,27 @@ public class AdsController {
         ResponseWrapperAds adsMe = adsService.getAdsMe();
         return ResponseEntity.ok(adsMe);
     }
+
+    @PatchMapping(value = "/{id}/image",
+            produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<byte[]> updateAdsImage(@PathVariable("id") Integer idAds, @RequestPart("image") MultipartFile image) {
+        Pair<byte[], String> pair = adsService.updateAdsImage(idAds, image);
+        return ResponseEntity.ok()
+                .contentLength(pair.getFirst().length)
+                .contentType(MediaType.parseMediaType(pair.getSecond()))
+                .body(pair.getFirst());
+    }
+
+    @GetMapping(value = "/{id}/image",
+            produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
+    public ResponseEntity<byte[]> getAdsImage(@PathVariable("id") Integer imageId){
+        Pair<byte[], String> pair = adsService.getAdsByUniqueId(imageId);
+        return ResponseEntity.ok()
+                .contentLength(pair.getFirst().length)
+                .contentType(MediaType.parseMediaType(pair.getSecond()))
+                .body(pair.getFirst());
+    }
+
 
 }

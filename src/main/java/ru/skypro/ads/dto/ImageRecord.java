@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ImageRecord {
-    private String file;
+    private String imageUrl;
     private Integer id;
 }

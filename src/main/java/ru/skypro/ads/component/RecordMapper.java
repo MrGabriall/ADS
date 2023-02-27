@@ -122,7 +122,7 @@ public class RecordMapper {
         adsRecord.setPk(ads.getId());
         adsRecord.setTitle(ads.getTitle());
         adsRecord.setPrice(ads.getPrice());
-        adsRecord.setImage(ads.getImage().getFilePath());
+        adsRecord.setImage(toRecord(ads.getImage()).getImageUrl());
         adsRecord.setAuthor(ads.getAuthor().getId());
         return adsRecord;
     }
@@ -132,12 +132,19 @@ public class RecordMapper {
         fullAdsRecord.setPk(ads.getId());
         fullAdsRecord.setTitle(ads.getTitle());
         fullAdsRecord.setPrice(ads.getPrice());
-        fullAdsRecord.setImage(ads.getImage().getFilePath());
+        fullAdsRecord.setImage(toRecord(ads.getImage()).getImageUrl());
         fullAdsRecord.setDescription(ads.getDescription());
         fullAdsRecord.setAuthorFirstName(ads.getAuthor().getFirstName());
         fullAdsRecord.setAuthorLastName(ads.getAuthor().getLastName());
         fullAdsRecord.setPhone(ads.getAuthor().getPhone());
         fullAdsRecord.setEmail(ads.getAuthor().getEmail());
         return fullAdsRecord;
+    }
+
+    public ImageRecord toRecord(Image image){
+        ImageRecord imageRecord = new ImageRecord();
+        imageRecord.setId(image.getId());
+        imageRecord.setImageUrl("/" + imageRecord.getId() + "/image");
+        return imageRecord;
     }
 }
