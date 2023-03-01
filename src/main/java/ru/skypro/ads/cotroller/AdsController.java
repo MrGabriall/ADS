@@ -16,7 +16,7 @@ public class AdsController {
     private AdsService adsService;
 
 
-    private AdsController(AdsService adsService) {
+    public AdsController(AdsService adsService) {
         this.adsService = adsService;
     }
 
@@ -29,13 +29,13 @@ public class AdsController {
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<AdsRecord> addAds(@RequestPart(value = "properties") CreateAdsReq createAdsReq,
                                             @RequestPart("image") MultipartFile multipartFile) {
-        return adsService.addAds(createAdsReq, multipartFile);
+        return ResponseEntity.ok(adsService.addAds(createAdsReq, multipartFile));
     }
 
     @GetMapping(value = "/{ad_pk}/comments",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseWrapperComment> getComments(@PathVariable("ad_pk") Integer adPk) {
-        return adsService.getAllCommentsById(adPk);
+        return ResponseEntity.ok(adsService.getAllCommentsById(adPk));
     }
 
     @PostMapping(value = "/{ad_pk}/comments",
@@ -43,18 +43,19 @@ public class AdsController {
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<CommentRecord> addComments(@PathVariable("ad_pk") Integer adPk,
                                                      @RequestBody CommentRecord commentRecord) {
-        return adsService.addComments(adPk, commentRecord);
+        return ResponseEntity.ok(adsService.addComments(adPk, commentRecord));
     }
 
     @GetMapping(value = "/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<FullAdsRecord> getFullAds(@PathVariable Integer id) {
-        return adsService.getFullAds(id);
+        return ResponseEntity.ok(adsService.getFullAds(id));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAds(@PathVariable Integer id) {
-        return adsService.deleteAds(id);
+        adsService.deleteAds(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PatchMapping(value = "/{id}",
@@ -62,20 +63,20 @@ public class AdsController {
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<AdsRecord> updateAds(@PathVariable Integer id,
                                                @RequestBody CreateAdsReq createAdsReq) {
-        return adsService.updateAds(id, createAdsReq);
+        return ResponseEntity.ok(adsService.updateAds(id, createAdsReq));
     }
 
     @GetMapping(value = "/{ad_pk}/comments/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<CommentRecord> getComments(@PathVariable("ad_pk") Integer adPk,
                                                      @PathVariable Integer id) {
-        return adsService.getAdsComments(adPk, id);
+        return ResponseEntity.ok(adsService.getAdsComment(adPk, id));
     }
 
     @DeleteMapping("/{ad_pk}/comments/{id}")
     public ResponseEntity<Void> deleteComments(@PathVariable("ad_pk") Integer adPk,
                                                @PathVariable Integer id) {
-        Boolean isDeleted = adsService.deleteComments(adPk, id);
+        Boolean isDeleted = adsService.deleteComment(adPk, id);
 
         if (isDeleted) {
             return new ResponseEntity<>(HttpStatus.OK);
@@ -91,7 +92,7 @@ public class AdsController {
     public ResponseEntity<CommentRecord> updateComments(@PathVariable("ad_pk") Integer adPk,
                                                         @PathVariable Integer id,
                                                         @RequestBody CommentRecord commentRecord) {
-        return adsService.updateComments(adPk, id, commentRecord);
+        return ResponseEntity.ok(adsService.updateComment(adPk, id, commentRecord));
     }
 
 
@@ -115,8 +116,8 @@ public class AdsController {
 
     @GetMapping(value = "/{id}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
-    public ResponseEntity<byte[]> getAdsImage(@PathVariable("id") Integer imageId){
-        Pair<byte[], String> pair = adsService.getAdsByUniqueId(imageId);
+    public ResponseEntity<byte[]> getAdsImage(@PathVariable("id") Integer imageId) {
+        Pair<byte[], String> pair = adsService.getAdsById(imageId);
         return ResponseEntity.ok()
                 .contentLength(pair.getFirst().length)
                 .contentType(MediaType.parseMediaType(pair.getSecond()))

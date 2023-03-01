@@ -1,6 +1,7 @@
 package ru.skypro.ads.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.component.RecordMapper;
@@ -9,6 +10,7 @@ import ru.skypro.ads.dto.UserRecord;
 import ru.skypro.ads.dto.password.NewPassword;
 import ru.skypro.ads.entity.Avatar;
 import ru.skypro.ads.entity.User;
+import ru.skypro.ads.exception.AvatarNotFoundException;
 import ru.skypro.ads.repository.AvatarRepository;
 import ru.skypro.ads.repository.UserRepository;
 
@@ -83,5 +85,10 @@ public class UserService {
     public void updateUserImage(MultipartFile image){
         User currentUser = getSingleUser();
         avatarService.updateAvatar(currentUser.getAvatar(), image);
+    }
+
+    public Pair<byte[], String> getAvatarById(Integer avatarId) {
+        Avatar avatar = avatarRepository.findById(avatarId).orElseThrow(() -> new AvatarNotFoundException());
+        return avatarService.getAvatarData(avatar);
     }
 }

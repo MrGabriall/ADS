@@ -4,8 +4,6 @@ import org.springframework.stereotype.Component;
 import ru.skypro.ads.dto.*;
 import ru.skypro.ads.entity.*;
 
-import java.time.LocalDateTime;
-
 @Component
 public class RecordMapper {
 
@@ -20,20 +18,9 @@ public class RecordMapper {
         user.setRegDate(userRecord.getRegDate());
         if (userRecord.getAvatarPath() != null) {
             Avatar avatar = new Avatar();
-            avatar.setFilePath(userRecord.getAvatarPath());
+            avatar.setFilePath("src/main/resources/files/avatars/basic_avatar.jpg");
             user.setAvatar(avatar);
         }
-        return user;
-    }
-
-    public User toEntity(RegisterReq registerReq) {
-        User user = new User();
-        user.setUserName(registerReq.getUsername());
-        user.setPassword(registerReq.getPassword());
-        user.setFirstName(registerReq.getFirstName());
-        user.setLastName(registerReq.getLastName());
-        user.setPhone(registerReq.getPhone());
-        user.setRegDate(LocalDateTime.now().toString());
         return user;
     }
 
@@ -46,7 +33,7 @@ public class RecordMapper {
         userRecord.setRegDate(user.getRegDate());
 
         if (user.getAvatar() != null) {
-            userRecord.setAvatarPath(user.getAvatar().getFilePath());
+            userRecord.setAvatarPath(toRecord(user.getAvatar()).getAvatarUrl());
         }
         if (user.getEmail() != null) {
             userRecord.setEmail(user.getEmail());
@@ -96,27 +83,6 @@ public class RecordMapper {
         return ads;
     }
 
-    public Ads toEntity(AdsRecord adsRecord) {
-        Ads ads = new Ads();
-
-        if (adsRecord.getAuthor() != null) {
-            User user = new User();
-            user.setId(adsRecord.getAuthor());
-            ads.setAuthor(user);
-        }
-
-        if (adsRecord.getImage() != null) {
-            Image image = new Image();
-            image.setFilePath(adsRecord.getImage());
-            image.setAds(ads);
-            ads.setImage(image);
-        }
-
-        ads.setPrice(adsRecord.getPrice());
-        ads.setTitle(adsRecord.getTitle());
-        return ads;
-    }
-
     public AdsRecord toRecord(Ads ads) {
         AdsRecord adsRecord = new AdsRecord();
         adsRecord.setPk(ads.getId());
@@ -141,10 +107,17 @@ public class RecordMapper {
         return fullAdsRecord;
     }
 
-    public ImageRecord toRecord(Image image){
+    public ImageRecord toRecord(Image image) {
         ImageRecord imageRecord = new ImageRecord();
         imageRecord.setId(image.getId());
-        imageRecord.setImageUrl("/" + imageRecord.getId() + "/image");
+        imageRecord.setImageUrl("/ads/" + imageRecord.getId() + "/image");
         return imageRecord;
+    }
+
+    public AvatarRecord toRecord(Avatar avatar) {
+        AvatarRecord avatarRecord = new AvatarRecord();
+        avatarRecord.setId(avatar.getId());
+        avatarRecord.setAvatarUrl("/users/me/" + avatarRecord.getId());
+        return avatarRecord;
     }
 }
