@@ -6,15 +6,16 @@ import ru.skypro.ads.entity.Ads;
 import ru.skypro.ads.entity.Comment;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Integer> {
 
-    List<Comment> findAllById(Integer id);
+    void removeAllByAds(Ads ads);
 
-    boolean removeAllByAdsId(Integer adsId);
-
-    Comment findCommentByAdsAndId(Ads ads, Integer id);
+    Optional<Comment> findCommentByAdsAndId(Ads adsId, Integer id);
 
     boolean deleteByAdsAndId(Ads ads, Integer id);
+
+    List<Comment> findAllByAds(Ads ads);
 }

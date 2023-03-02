@@ -13,7 +13,7 @@ import ru.skypro.ads.service.AdsService;
 @RestController
 @RequestMapping("/ads")
 public class AdsController {
-    private AdsService adsService;
+    private final AdsService adsService;
 
 
     public AdsController(AdsService adsService) {
@@ -43,7 +43,7 @@ public class AdsController {
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<CommentRecord> addComments(@PathVariable("ad_pk") Integer adPk,
                                                      @RequestBody CommentRecord commentRecord) {
-        return ResponseEntity.ok(adsService.addComments(adPk, commentRecord));
+        return ResponseEntity.ok(adsService.addComment(adPk, commentRecord));
     }
 
     @GetMapping(value = "/{id}",
@@ -76,14 +76,8 @@ public class AdsController {
     @DeleteMapping("/{ad_pk}/comments/{id}")
     public ResponseEntity<Void> deleteComments(@PathVariable("ad_pk") Integer adPk,
                                                @PathVariable Integer id) {
-        Boolean isDeleted = adsService.deleteComment(adPk, id);
-
-        if (isDeleted) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
+        adsService.deleteComment(adPk, id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PatchMapping(value = "/{ad_pk}/comments/{id}",
@@ -117,12 +111,10 @@ public class AdsController {
     @GetMapping(value = "/{id}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE})
     public ResponseEntity<byte[]> getAdsImage(@PathVariable("id") Integer imageId) {
-        Pair<byte[], String> pair = adsService.getAdsById(imageId);
+        Pair<byte[], String> pair = adsService.getImageById(imageId);
         return ResponseEntity.ok()
                 .contentLength(pair.getFirst().length)
                 .contentType(MediaType.parseMediaType(pair.getSecond()))
                 .body(pair.getFirst());
     }
-
-
 }

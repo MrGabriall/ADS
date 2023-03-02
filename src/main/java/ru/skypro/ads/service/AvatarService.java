@@ -1,5 +1,7 @@
 package ru.skypro.ads.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import java.nio.file.Path;
 @Service
 public class AvatarService {
 
+    Logger logger = LoggerFactory.getLogger(AdsService.class);
     @Value("${application.avatars}")
     private String avatarsDir;
     private final AvatarRepository avatarRepository;
@@ -24,12 +27,12 @@ public class AvatarService {
         this.imageWriter = imageWriter;
     }
 
-    public Avatar updateAvatar(Avatar avatar, MultipartFile file) {
-        checkImage(avatar);
-
-        if (deleteAvatar(avatar)) {
-            return addAvatar(file);
-        } else return avatar;
+    public void updateAvatar(Avatar avatar, MultipartFile file) {
+        if (avatar != null) {
+            checkImage(avatar);
+            deleteAvatar(avatar);
+        }
+        addAvatar(file);
     }
 
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
@@ -37,29 +40,26 @@ public class AvatarService {
         return imageWriter.getImage(avatar.getFilePath());
     }
 
-    private boolean deleteAvatar(Avatar avatar) {
+    private void deleteAvatar(Avatar avatar) {
         avatarRepository.delete(avatar);
-        boolean isDeleted = imageWriter.deleteImage(Path.of(avatar.getFilePath()));
+        imageWriter.deleteImage(Path.of(avatar.getFilePath()));
 
-        if (isDeleted && avatarRepository.findById(avatar.getId()).isEmpty()) {
-            return true;
-        } else {
-            return false;
+        boolean isAvatarDeleted = avatarRepository.findById(avatar.getId()).isEmpty();
+        if (!isAvatarDeleted) {
+            logger.error(avatar + " isn't removed in DB");
         }
     }
 
-    public Avatar addAvatar(MultipartFile file) {
+    public void addAvatar(MultipartFile file) {
         Path path = imageWriter.writeImage(file, avatarsDir);
 
         Avatar avatar = new Avatar();
         avatar.setFilePath(path.toString());
-        avatar = avatarRepository.save(avatar);
-        return avatar;
+        avatarRepository.save(avatar);
     }
 
     private void checkImage(Avatar avatar) {
-        if (avatar == null || avatar.getId() == null ||
-                avatarRepository.findById(avatar.getId()).isEmpty()) {
+        if (avatar.getId() == null || avatarRepository.findById(avatar.getId()).isEmpty()) {
             throw new AvatarNotFoundException();
         }
     }

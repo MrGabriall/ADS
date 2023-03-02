@@ -13,14 +13,14 @@ import ru.skypro.ads.repository.ImageRepository;
 import java.nio.file.Path;
 
 @Service
-public class ImageService {
+public class ImageServiceImpl {
 
-    @Value("${application.avatars}")
+    @Value("${application.images}")
     private String imagesDir;
     private final ImageRepository imageRepository;
     private final ImageWriter imageWriter;
 
-    public ImageService(ImageRepository imageRepository, ImageWriter imageWriter) {
+    public ImageServiceImpl(ImageRepository imageRepository, ImageWriter imageWriter) {
         this.imageRepository = imageRepository;
         this.imageWriter = imageWriter;
     }
@@ -41,12 +41,7 @@ public class ImageService {
     public boolean deleteImage(Image image) {
         imageRepository.delete(image);
         boolean isDeleted = imageWriter.deleteImage(Path.of(image.getFilePath()));
-
-        if (isDeleted && imageRepository.findById(image.getId()).isEmpty()) {
-            return true;
-        } else {
-            return false;
-        }
+        return isDeleted && imageRepository.findById(image.getId()).isEmpty();
     }
 
     public Image addImage(Ads ads, MultipartFile file) {

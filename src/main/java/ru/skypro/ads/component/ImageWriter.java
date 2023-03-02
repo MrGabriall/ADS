@@ -28,18 +28,15 @@ public class ImageWriter {
         try {
             return Files.write(path, file.getBytes());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error with write " + file + " in " + dir);
         }
     }
 
     public boolean deleteImage(Path path) {
         try {
-            if (Files.deleteIfExists(path)) {
-                return true;
-            }
-            return false;
+            return Files.deleteIfExists(path);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(path + " file in not removed in file system");
         }
     }
 
@@ -48,7 +45,7 @@ public class ImageWriter {
         try {
             bytes = Files.readAllBytes(Paths.get(path));
         } catch (IOException | NullPointerException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error with read bytes of " + path);
         }
         return Pair.of(bytes, MediaType.IMAGE_JPEG_VALUE);
     }

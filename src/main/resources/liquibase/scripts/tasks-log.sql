@@ -67,3 +67,6 @@ ALTER TABLE images rename column file to file_path;
 ALTER TABLE users ALTER COLUMN role DROP NOT NULL;
 ALTER TABLE ads ALTER COLUMN image DROP NOT NULL;
 ALTER TABLE ads ALTER COLUMN description DROP NOT NULL;
+
+--changeSet mrgabriell:9
+ALTER TABLE users ALTER column avatar DROP NOT NULL;

@@ -1,6 +1,5 @@
 package ru.skypro.ads.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,8 +21,6 @@ public class UserService {
     private static User user;
     private final RecordMapper recordMapper;
     private final AvatarService avatarService;
-    @Value("${application.basic-avatar}")
-    private String basicAvatarPath;
     private final AvatarRepository avatarRepository;
 
     public UserService(UserRepository userRepository, RecordMapper recordMapper, AvatarService avatarService,
@@ -34,8 +31,8 @@ public class UserService {
         this.avatarRepository = avatarRepository;
     }
 
-    private User getSingleUser(){
-        if (user == null){
+    private User getSingleUser() {
+        if (user == null) {
             user = new User();
             user.setId(1);
             user.setFirstName("Работяга");
@@ -46,14 +43,8 @@ public class UserService {
             user.setRegDate(LocalDate.now().toString());
             user.setUserName("User");
             user.setPassword("password");
-            Avatar avatar = new Avatar();
-            avatar.setFilePath(basicAvatarPath);
-            avatar = avatarRepository.save(avatar);
-            user.setAvatar(avatar);
             user.setRole(Role.ADMIN);
             user = userRepository.save(user);
-            System.out.println("ИНИЦИАЛИЗАЦИЯ И ID" + user.getId() +
-                    "\n " + user.getRegDate() + " \n" + user.getAvatar().getFilePath());
         }
         return user;
 
@@ -63,16 +54,16 @@ public class UserService {
         return recordMapper.toRecord(getSingleUser());
     }
 
-    public NewPassword setPassword(NewPassword newPassword){
+    public NewPassword setPassword(NewPassword newPassword) {
         User singleUser = getSingleUser();
-        if (singleUser.getPassword().equals(newPassword.getCurrentPassword())){
+        if (singleUser.getPassword().equals(newPassword.getCurrentPassword())) {
             singleUser.setPassword(newPassword.getNewPassword());
             userRepository.save(singleUser);
         }
         return newPassword;
     }
 
-    public UserRecord updateUser(UserRecord userRecord){
+    public UserRecord updateUser(UserRecord userRecord) {
         User userEntity = recordMapper.toEntity(userRecord);
         User currentUser = getSingleUser();
         currentUser.setFirstName(userEntity.getFirstName());
@@ -82,13 +73,13 @@ public class UserService {
         return recordMapper.toRecord(user);
     }
 
-    public void updateUserImage(MultipartFile image){
+    public void updateUserImage(MultipartFile image) {
         User currentUser = getSingleUser();
         avatarService.updateAvatar(currentUser.getAvatar(), image);
     }
 
     public Pair<byte[], String> getAvatarById(Integer avatarId) {
-        Avatar avatar = avatarRepository.findById(avatarId).orElseThrow(() -> new AvatarNotFoundException());
+        Avatar avatar = avatarRepository.findById(avatarId).orElseThrow(AvatarNotFoundException::new);
         return avatarService.getAvatarData(avatar);
     }
 }

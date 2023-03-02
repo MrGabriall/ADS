@@ -12,6 +12,7 @@ import ru.skypro.ads.entity.Comment;
 import ru.skypro.ads.entity.Image;
 import ru.skypro.ads.entity.User;
 import ru.skypro.ads.exception.AdsNotFoundException;
+import ru.skypro.ads.exception.CommentNotFoundException;
 import ru.skypro.ads.exception.ImageNotFoundException;
 import ru.skypro.ads.repository.AdsRepository;
 import ru.skypro.ads.repository.CommentRepository;
@@ -26,18 +27,18 @@ public class AdsService {
     private final AdsRepository adsRepository;
     private final CommentRepository commentRepository;
     private final RecordMapper recordMapper;
-    private final ImageService imageService;
+    private final ImageServiceImpl imageServiceImpl;
     private final ImageRepository imageRepository;
     private final UserService userService;
 
     public AdsService(AdsRepository adsRepository,
-                       CommentRepository commentRepository,
-                       RecordMapper recordMapper, ImageService imageService,
-                       ImageRepository imageRepository, UserService userService) {
+                      CommentRepository commentRepository,
+                      RecordMapper recordMapper, ImageServiceImpl imageServiceImpl,
+                      ImageRepository imageRepository, UserService userService) {
         this.adsRepository = adsRepository;
         this.commentRepository = commentRepository;
         this.recordMapper = recordMapper;
-        this.imageService = imageService;
+        this.imageServiceImpl = imageServiceImpl;
         this.imageRepository = imageRepository;
         this.userService = userService;
     }
@@ -46,12 +47,10 @@ public class AdsService {
         List<Ads> listAds = adsRepository.findAll();
         List<AdsRecord> listAdsRecords = new ArrayList<>();
 
-        for (int i = 0; i < listAds.size(); i++) {
-            listAdsRecords.add(recordMapper.toRecord(listAds.get(i)));
+        for (Ads listAd : listAds) {
+            listAdsRecords.add(recordMapper.toRecord(listAd));
         }
-        ResponseWrapperAds responseWrapperAds = new ResponseWrapperAds(listAdsRecords.size(), listAdsRecords);
-        System.out.println(responseWrapperAds);
-        return responseWrapperAds;
+        return new ResponseWrapperAds(listAdsRecords.size(), listAdsRecords);
     }
 
     public AdsRecord addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile) {
@@ -60,14 +59,15 @@ public class AdsService {
         UserRecord user = userService.getUser();
         ads.setAuthor(recordMapper.toEntity(user));
         ads = adsRepository.save(ads);
-        ads.setImage(imageService.addImage(ads, multipartFile));
+        ads.setImage(imageServiceImpl.addImage(ads, multipartFile));
         ads = adsRepository.save(ads);
         return recordMapper.toRecord(ads);
     }
 
-    public ResponseWrapperComment getAllCommentsById(Integer id) {
+    public ResponseWrapperComment getAllCommentsById(Integer adsId) {
         List<CommentRecord> list = new ArrayList<>();
-        List<Comment> listComments = commentRepository.findAllById(id);
+        Ads ads = adsRepository.findAdsById(adsId);
+        List<Comment> listComments = commentRepository.findAllByAds(ads);
 
         for (int i = 0; i < listComments.size(); i++) {
             list.add(i, recordMapper.toRecord(listComments.get(i)));
@@ -75,35 +75,26 @@ public class AdsService {
         return new ResponseWrapperComment(list.size(), list);
     }
 
-    public CommentRecord addComments(Integer adsId, CommentRecord commentRecord) {
-        Comment comment = recordMapper.toEntity(commentRecord);
-        comment.setAds(adsRepository.findById(adsId).orElseThrow(() -> new AdsNotFoundException()));
-        commentRepository.save(comment);
-        return commentRecord;
-    }
-
     public FullAdsRecord getFullAds(Integer id) {
-        Ads ads = adsRepository.findById(id).orElseThrow(() -> new AdsNotFoundException());
+        Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
         return recordMapper.toFullAdsRecord(ads);
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void deleteAds(Integer id) {
-        //TODO написать удаление комментов и картинок
-        Ads ads = adsRepository.findById(id).orElseThrow(() -> new AdsNotFoundException());
+        Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
         Image image = ads.getImage();
         if (image != null) {
-            if (imageService.deleteImage(image) && commentRepository.removeAllByAdsId(ads.getId())) {
-                adsRepository.deleteById(id);
-                //TODO Написать эксепшны и добавить в хендлер
-            } else throw new RuntimeException("Exception with delete image or comments");
-        } else throw new RuntimeException("Exception with find image");
-
-
+            if (!imageServiceImpl.deleteImage(image)) {
+                throw new ImageNotFoundException();
+            }
+        }
+        commentRepository.removeAllByAds(ads);
+        adsRepository.deleteById(id);
     }
 
     public AdsRecord updateAds(Integer id, CreateAdsReq createAdsReq) {
-        Ads ads = adsRepository.findById(id).orElseThrow(() -> new AdsNotFoundException());
+        Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
         Ads newAds = recordMapper.toEntity(createAdsReq);
         ads.setDescription(newAds.getDescription());
         ads.setPrice(newAds.getPrice());
@@ -112,30 +103,42 @@ public class AdsService {
         return recordMapper.toRecord(ads);
     }
 
-    public CommentRecord getAdsComment(Integer adPk, Integer id) {
-        Ads ads = adsRepository.findById(adPk).orElseThrow(() -> new AdsNotFoundException());
-        Comment comment = commentRepository.findCommentByAdsAndId(ads, id);
+    public CommentRecord addComment(Integer adsId, CommentRecord commentRecord) {
+        Comment comment = recordMapper.toEntity(commentRecord);
+        comment = commentRepository.save(comment);
+        comment.setAds(adsRepository.findById(adsId).orElseThrow(AdsNotFoundException::new));
+        commentRepository.save(comment);
+        return commentRecord;
+    }
+
+    public CommentRecord getAdsComment(Integer adPk, Integer commentId) {
+        Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        Comment comment = commentRepository.findCommentByAdsAndId(ads, commentId)
+                .orElseThrow(CommentNotFoundException::new);
         return recordMapper.toRecord(comment);
     }
 
-    public boolean deleteComment(Integer adPk, Integer id) {
-        Ads ads = adsRepository.findById(adPk).orElseThrow(() -> new AdsNotFoundException());
-        return commentRepository.deleteByAdsAndId(ads, id);
+    public void deleteComment(Integer adPk, Integer id) {
+        Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        if (!commentRepository.deleteByAdsAndId(ads, id)) {
+            throw new CommentNotFoundException();
+        }
     }
 
     public CommentRecord updateComment(Integer adPk, Integer id, CommentRecord commentRecord) {
-        Ads ads = adsRepository.findById(adPk).orElseThrow(() -> new AdsNotFoundException());
-        Comment oldComment = commentRepository.findCommentByAdsAndId(ads, id);
+        Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        Comment oldComment = commentRepository.findCommentByAdsAndId(ads, id)
+                .orElseThrow(CommentNotFoundException::new);
         oldComment.setText(commentRecord.getText());
         commentRepository.save(oldComment);
         return recordMapper.toRecord(oldComment);
     }
 
     public Pair<byte[], String> updateAdsImage(Integer idAds, MultipartFile image) {
-        Ads ads = adsRepository.findAdsById(idAds);
+        Ads ads = adsRepository.findById(idAds).orElseThrow(AdsNotFoundException::new);
         Image oldImage = imageRepository.findByAdsId(ads);
-        Image newImage = imageService.updateImage(ads, oldImage, image);
-        return imageService.getImageData(newImage);
+        Image newImage = imageServiceImpl.updateImage(ads, oldImage, image);
+        return imageServiceImpl.getImageData(newImage);
     }
 
     public ResponseWrapperAds getAdsMe() {
@@ -151,9 +154,9 @@ public class AdsService {
         return new ResponseWrapperAds(list.size(), list);
     }
 
-    public Pair<byte[], String> getAdsById(Integer uniqId) {
-        Image image = imageRepository.findById(uniqId).orElseThrow(() -> new ImageNotFoundException());
-        return imageService.getImageData(image);
+    public Pair<byte[], String> getImageById(Integer uniqId) {
+        Image image = imageRepository.findById(uniqId).orElseThrow(ImageNotFoundException::new);
+        return imageServiceImpl.getImageData(image);
     }
 
 }
