@@ -41,7 +41,6 @@ public class RecordMapper {
         if (user.getCity() != null) {
             userRecord.setCity(user.getCity());
         }
-        System.out.println("USER RECORD INFO :" + userRecord);
         return userRecord;
     }
 
@@ -88,7 +87,9 @@ public class RecordMapper {
         adsRecord.setPk(ads.getId());
         adsRecord.setTitle(ads.getTitle());
         adsRecord.setPrice(ads.getPrice());
-        adsRecord.setImage(toRecord(ads.getImage()).getImageUrl());
+        if (ads.getImage() != null) {
+            adsRecord.setImage(toRecord(ads.getImage()).getImageUrl());
+        }
         adsRecord.setAuthor(ads.getAuthor().getId());
         return adsRecord;
     }
@@ -98,6 +99,7 @@ public class RecordMapper {
         fullAdsRecord.setPk(ads.getId());
         fullAdsRecord.setTitle(ads.getTitle());
         fullAdsRecord.setPrice(ads.getPrice());
+        //TODO
         fullAdsRecord.setImage(toRecord(ads.getImage()).getImageUrl());
         fullAdsRecord.setDescription(ads.getDescription());
         fullAdsRecord.setAuthorFirstName(ads.getAuthor().getFirstName());
@@ -109,8 +111,11 @@ public class RecordMapper {
 
     public ImageRecord toRecord(Image image) {
         ImageRecord imageRecord = new ImageRecord();
-        imageRecord.setId(image.getId());
-        imageRecord.setImageUrl("/ads/" + imageRecord.getId() + "/image");
+        //TODO
+        if (image.getId() != null) {
+            imageRecord.setId(image.getId());
+            imageRecord.setImageUrl("/ads/" + imageRecord.getId() + "/image");
+        }
         return imageRecord;
     }
 

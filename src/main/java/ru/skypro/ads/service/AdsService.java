@@ -55,7 +55,6 @@ public class AdsService {
 
     public AdsRecord addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile) {
         Ads ads = recordMapper.toEntity(createAdsReq);
-        System.out.println(ads);
         UserRecord user = userService.getUser();
         ads.setAuthor(recordMapper.toEntity(user));
         ads = adsRepository.save(ads);

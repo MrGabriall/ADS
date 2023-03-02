@@ -46,7 +46,7 @@ public class AvatarService {
 
         boolean isAvatarDeleted = avatarRepository.findById(avatar.getId()).isEmpty();
         if (!isAvatarDeleted) {
-            logger.error(avatar + " isn't removed in DB");
+            //logger.error(avatar + " isn't removed in DB");
         }
     }
 
