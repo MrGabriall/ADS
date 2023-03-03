@@ -24,12 +24,13 @@ public class AvatarService {
         this.imageWriter = imageWriter;
     }
 
-    public void updateAvatar(Avatar avatar, MultipartFile file) {
+    public Avatar updateAvatar(Avatar avatar, MultipartFile file) {
         if (avatar != null) {
             checkImage(avatar);
             deleteAvatarInFS(avatar);
         }
         addAvatar(avatar, file);
+        return avatar;
     }
 
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
