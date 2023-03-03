@@ -99,7 +99,6 @@ public class RecordMapper {
 
     public ImageRecord toRecord(Image image) {
         ImageRecord imageRecord = new ImageRecord();
-        //TODO
         if (image.getId() != null) {
             imageRecord.setId(image.getId());
             imageRecord.setImageUrl("/ads/" + imageRecord.getId() + "/image");
@@ -111,9 +110,8 @@ public class RecordMapper {
         AvatarRecord avatarRecord = new AvatarRecord();
         if (avatar != null) {
             avatarRecord.setId(avatar.getId());
-            avatarRecord.setAvatarUrl("/users/me/" + avatarRecord.getId());
+            avatarRecord.setAvatarUrl("/users/me/get_avatar/" + avatar.getId());
         }
-        System.out.println(avatarRecord);
         return avatarRecord;
     }
 }

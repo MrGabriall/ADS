@@ -46,7 +46,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping(path = "/me/{avatar_id}",
+    @GetMapping(path = "/me/get_avatar/{avatar_id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<byte[]> getImage(@PathVariable("avatar_id") Integer avatarId) {
         Pair<byte[], String> pair = userService.getAvatarById(avatarId);
