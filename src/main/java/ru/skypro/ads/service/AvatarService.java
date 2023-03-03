@@ -28,8 +28,8 @@ public class AvatarService {
         if (avatar != null) {
             checkImage(avatar);
             deleteAvatarInFS(avatar);
-            addAvatar(avatar, file);
         }
+        addAvatar(avatar, file);
     }
 
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
@@ -43,7 +43,9 @@ public class AvatarService {
 
     public void addAvatar(Avatar avatar, MultipartFile file) {
         Path path = imageWriter.writeImage(file, avatarsDir);
-
+        if (avatar == null){
+            avatar = new Avatar();
+        }
         avatar.setFilePath(path.toString());
         avatarRepository.save(avatar);
     }
