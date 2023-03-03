@@ -17,6 +17,7 @@ import ru.skypro.ads.exception.ImageNotFoundException;
 import ru.skypro.ads.repository.AdsRepository;
 import ru.skypro.ads.repository.CommentRepository;
 import ru.skypro.ads.repository.ImageRepository;
+import ru.skypro.ads.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +31,20 @@ public class AdsService {
     private final ImageServiceImpl imageServiceImpl;
     private final ImageRepository imageRepository;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     public AdsService(AdsRepository adsRepository,
                       CommentRepository commentRepository,
                       RecordMapper recordMapper, ImageServiceImpl imageServiceImpl,
-                      ImageRepository imageRepository, UserService userService) {
+                      ImageRepository imageRepository, UserService userService,
+                      UserRepository userRepository) {
         this.adsRepository = adsRepository;
         this.commentRepository = commentRepository;
         this.recordMapper = recordMapper;
         this.imageServiceImpl = imageServiceImpl;
         this.imageRepository = imageRepository;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     public ResponseWrapperAds getAllAds() {
@@ -63,7 +67,7 @@ public class AdsService {
         return recordMapper.toRecord(ads);
     }
 
-    public ResponseWrapperComment getAllCommentsById(Integer adsId) {
+    public ResponseWrapperComment getAllCommentsByAdsId(Integer adsId) {
         List<CommentRecord> list = new ArrayList<>();
         Ads ads = adsRepository.findAdsById(adsId);
         List<Comment> listComments = commentRepository.findAllByAds(ads);
@@ -103,11 +107,11 @@ public class AdsService {
     }
 
     public CommentRecord addComment(Integer adsId, CommentRecord commentRecord) {
-        Comment comment = recordMapper.toEntity(commentRecord);
+        Ads ads = adsRepository.findById(adsId).orElseThrow(AdsNotFoundException::new);
+        User author = userRepository.findById(commentRecord.getAuthorId()).orElseThrow(RuntimeException::new);
+        Comment comment = recordMapper.toEntity(commentRecord, ads, author);
         comment = commentRepository.save(comment);
-        comment.setAds(adsRepository.findById(adsId).orElseThrow(AdsNotFoundException::new));
-        commentRepository.save(comment);
-        return commentRecord;
+        return recordMapper.toRecord(comment);
     }
 
     public CommentRecord getAdsComment(Integer adPk, Integer commentId) {

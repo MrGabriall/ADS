@@ -31,10 +31,8 @@ public class RecordMapper {
         userRecord.setLastName(user.getLastName());
         userRecord.setPhone(user.getPhone());
         userRecord.setRegDate(user.getRegDate());
+        userRecord.setAvatarPath(toRecord(user.getAvatar()).getAvatarUrl());
 
-        if (user.getAvatar() != null) {
-            userRecord.setAvatarPath(toRecord(user.getAvatar()).getAvatarUrl());
-        }
         if (user.getEmail() != null) {
             userRecord.setEmail(user.getEmail());
         }
@@ -44,30 +42,20 @@ public class RecordMapper {
         return userRecord;
     }
 
-    public Comment toEntity(CommentRecord commentRecord) {
+    public Comment toEntity(CommentRecord commentRecord, Ads ads, User author) {
         Comment comment = new Comment();
-
-        if (commentRecord.getAdsId() != null) {
-            Ads ads = new Ads();
-            ads.setId(commentRecord.getAdsId());
-            comment.setAds(ads);
-        }
-
-        if (commentRecord.getAuthor() != null) {
-            User user = new User();
-            user.setId(commentRecord.getAuthor());
-            comment.setAuthor(user);
-        }
-
-        comment.setText(comment.getText());
-        comment.setCreatedAt(comment.getCreatedAt());
+        comment.setId(commentRecord.getPk());
+        comment.setAds(ads);
+        comment.setAuthor(author);
+        comment.setText(commentRecord.getText());
+        comment.setCreatedAt(commentRecord.getCreatedAt());
         return comment;
     }
 
     public CommentRecord toRecord(Comment comment) {
         CommentRecord commentRecord = new CommentRecord();
         commentRecord.setPk(comment.getId());
-        commentRecord.setAuthor(comment.getAuthor().getId());
+        commentRecord.setAuthorId(comment.getAuthor().getId());
         commentRecord.setAdsId(comment.getAds().getId());
         commentRecord.setText(comment.getText());
         commentRecord.setCreatedAt(comment.getCreatedAt());

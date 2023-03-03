@@ -35,7 +35,7 @@ public class AdsController {
     @GetMapping(value = "/{ad_pk}/comments",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<ResponseWrapperComment> getComments(@PathVariable("ad_pk") Integer adPk) {
-        return ResponseEntity.ok(adsService.getAllCommentsById(adPk));
+        return ResponseEntity.ok(adsService.getAllCommentsByAdsId(adPk));
     }
 
     @PostMapping(value = "/{ad_pk}/comments",
