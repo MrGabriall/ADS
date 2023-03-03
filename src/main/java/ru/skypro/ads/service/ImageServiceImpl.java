@@ -49,7 +49,7 @@ public class ImageServiceImpl {
 
         Image image = new Image();
         image.setFilePath(path.toString());
-        //image.setAds(ads);
+        image.setAdsId(ads.getId());
         image = imageRepository.save(image);
         return image;
     }
