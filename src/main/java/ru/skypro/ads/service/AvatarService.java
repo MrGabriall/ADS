@@ -29,8 +29,7 @@ public class AvatarService {
             checkImage(avatar);
             deleteAvatarInFS(avatar);
         }
-        addAvatar(avatar, file);
-        return avatar;
+        return addAvatar(avatar, file);
     }
 
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
@@ -42,13 +41,13 @@ public class AvatarService {
         imageWriter.deleteImage(Path.of(avatar.getFilePath()));
     }
 
-    public void addAvatar(Avatar avatar, MultipartFile file) {
+    public Avatar addAvatar(Avatar avatar, MultipartFile file) {
         Path path = imageWriter.writeImage(file, avatarsDir);
         if (avatar == null){
             avatar = new Avatar();
         }
         avatar.setFilePath(path.toString());
-        avatarRepository.save(avatar);
+        return avatarRepository.save(avatar);
     }
 
     private void checkImage(Avatar avatar) {

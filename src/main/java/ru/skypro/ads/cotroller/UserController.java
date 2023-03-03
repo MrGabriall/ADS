@@ -13,7 +13,7 @@ import ru.skypro.ads.service.UserService;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
-@RequestMapping(value = "users")
+@RequestMapping(value = "/users")
 @RequiredArgsConstructor
 public class UserController {
 

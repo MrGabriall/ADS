@@ -76,6 +76,7 @@ public class UserService {
     public void updateUserImage(MultipartFile image) {
         User currentUser = getSingleUser();
         currentUser.setAvatar(avatarService.updateAvatar(currentUser.getAvatar(), image));
+        user = userRepository.save(currentUser);
     }
 
     public Pair<byte[], String> getAvatarById(Integer avatarId) {

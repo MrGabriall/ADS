@@ -109,8 +109,11 @@ public class RecordMapper {
 
     public AvatarRecord toRecord(Avatar avatar) {
         AvatarRecord avatarRecord = new AvatarRecord();
-        avatarRecord.setId(avatar.getId());
-        avatarRecord.setAvatarUrl("/users/me/" + avatarRecord.getId());
+        if (avatar != null) {
+            avatarRecord.setId(avatar.getId());
+            avatarRecord.setAvatarUrl("/users/me/" + avatarRecord.getId());
+        }
+        System.out.println(avatarRecord);
         return avatarRecord;
     }
 }
