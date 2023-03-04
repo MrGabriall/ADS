@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.dto.*;
 import ru.skypro.ads.service.AdsService;
+import ru.skypro.ads.service.UserService;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/ads")
 public class AdsController {
     private final AdsService adsService;
-
 
     public AdsController(AdsService adsService) {
         this.adsService = adsService;
@@ -43,7 +43,8 @@ public class AdsController {
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<CommentRecord> addComments(@PathVariable("ad_pk") Integer adPk,
                                                      @RequestBody CommentRecord commentRecord) {
-        return ResponseEntity.ok(adsService.addComment(adPk, commentRecord));
+        CommentRecord record = adsService.addComment(adPk, commentRecord);
+        return ResponseEntity.ok(record);
     }
 
     @GetMapping(value = "/{id}",

@@ -19,6 +19,8 @@ import ru.skypro.ads.repository.CommentRepository;
 import ru.skypro.ads.repository.ImageRepository;
 import ru.skypro.ads.repository.UserRepository;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,6 +109,10 @@ public class AdsService {
     }
 
     public CommentRecord addComment(Integer adsId, CommentRecord commentRecord) {
+        commentRecord.setAdsId(adsId);
+        commentRecord.setAuthorId(userService.getUser().getId());
+        commentRecord.setCreatedAt(LocalDate.now().toString());
+        commentRecord.setPk(1);
         Ads ads = adsRepository.findById(adsId).orElseThrow(AdsNotFoundException::new);
         User author = userRepository.findById(commentRecord.getAuthorId()).orElseThrow(RuntimeException::new);
         Comment comment = recordMapper.toEntity(commentRecord, ads, author);
