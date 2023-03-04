@@ -49,6 +49,7 @@ public class UserController {
     @GetMapping(path = "/me/get_avatar/{avatar_id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<byte[]> getImage(@PathVariable("avatar_id") Integer avatarId) {
+        System.out.println("///////////// Response from GETIMAGE" );
         Pair<byte[], String> pair = userService.getAvatarById(avatarId);
         return ResponseEntity.ok()
                 .contentLength(pair.getFirst().length)
