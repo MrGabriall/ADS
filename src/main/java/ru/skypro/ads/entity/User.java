@@ -16,14 +16,14 @@ public class User {
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "first_name")
     private String firstName;
 
     @Column(name = "last_name")
     private String lastName;
-
-    @Column(name = "email")
-    private String email;
 
     @Column(name = "phone")
     private String phone;
@@ -36,6 +36,7 @@ public class User {
 
     @Column(name = "username")
     private String userName;
+
     @Column(name = "password")
     private String password;
 

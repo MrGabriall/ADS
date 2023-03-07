@@ -56,10 +56,10 @@ public class AdsService {
         }
         return new ResponseWrapperAds(listAdsRecords.size(), listAdsRecords);
     }
-
-    public AdsRecord addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile) {
+//todo добавлен parameter email
+    public AdsRecord addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile, String email) {
         Ads ads = recordMapper.toEntity(createAdsReq);
-        UserRecord user = userService.getUser();
+        UserRecord user = recordMapper.toRecord(userRepository.findByEmail(email));
         ads.setAuthor(recordMapper.toEntity(user));
         ads = adsRepository.save(ads);
         ads.setImage(imageServiceImpl.addImage(ads, multipartFile));
@@ -143,11 +143,11 @@ public class AdsService {
         Image newImage = imageServiceImpl.updateImage(ads, oldImage, image);
         return imageServiceImpl.getImageData(newImage);
     }
-
-    public ResponseWrapperAds getAdsMe() {
+//todo добавлен параметер email
+    public ResponseWrapperAds getAdsMe(String email) {
         List<AdsRecord> list = new ArrayList<>();
 
-        UserRecord userRecord = userService.getUser();
+        UserRecord userRecord = recordMapper.toRecord(userRepository.findByEmail(email));
         User user = recordMapper.toEntity(userRecord);
 
         List<Ads> listAds = adsRepository.findAllByAuthorId(user.getId());

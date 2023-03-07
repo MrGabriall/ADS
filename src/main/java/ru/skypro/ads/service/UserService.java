@@ -30,7 +30,7 @@ public class UserService {
         this.avatarService = avatarService;
         this.avatarRepository = avatarRepository;
     }
-
+/*
     private User getSingleUser() {
         if (user == null) {
             user = new User();
@@ -47,25 +47,26 @@ public class UserService {
             user = userRepository.save(user);
         }
         return user;
-
+    }
+ */
+//todo email added
+    public UserRecord getUser(String email) {
+        return recordMapper.toRecord(userRepository.findByEmail(email));
     }
 
-    public UserRecord getUser() {
-        return recordMapper.toRecord(getSingleUser());
-    }
-
-    public NewPassword setPassword(NewPassword newPassword) {
-        User singleUser = getSingleUser();
+//todo должен быть второй параметр  - email!
+    public NewPassword setPassword(NewPassword newPassword, String email) {
+        User singleUser = userRepository.findByEmail(email);
         if (singleUser.getPassword().equals(newPassword.getCurrentPassword())) {
             singleUser.setPassword(newPassword.getNewPassword());
             userRepository.save(singleUser);
         }
         return newPassword;
     }
-
-    public UserRecord updateUser(UserRecord userRecord) {
+//todo должен быть второй параметр  - email! Везде где имеется getSingleUser применить userRepository.findByEmail()
+    public UserRecord updateUser(UserRecord userRecord, String email) {
         User userEntity = recordMapper.toEntity(userRecord);
-        User currentUser = getSingleUser();
+        User currentUser = userRepository.findByEmail(email);
         currentUser.setFirstName(userEntity.getFirstName());
         currentUser.setLastName(userEntity.getLastName());
         currentUser.setPhone(userEntity.getPhone());
@@ -73,8 +74,8 @@ public class UserService {
         return recordMapper.toRecord(user);
     }
 
-    public void updateUserImage(MultipartFile image) {
-        User currentUser = getSingleUser();
+    public void updateUserImage(MultipartFile image, String email) {
+        User currentUser = userRepository.findByEmail(email);
         currentUser.setAvatar(avatarService.updateAvatar(currentUser.getAvatar(), image));
         user = userRepository.save(currentUser);
     }

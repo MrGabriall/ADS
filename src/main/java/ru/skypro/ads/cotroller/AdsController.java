@@ -4,6 +4,8 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.dto.*;
@@ -28,8 +30,9 @@ public class AdsController {
     @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<AdsRecord> addAds(@RequestPart(value = "properties") CreateAdsReq createAdsReq,
-                                            @RequestPart("image") MultipartFile multipartFile) {
-        return ResponseEntity.ok(adsService.addAds(createAdsReq, multipartFile));
+                                            @RequestPart("image") MultipartFile multipartFile,
+                                            Authentication authentication) {
+        return ResponseEntity.ok(adsService.addAds(createAdsReq, multipartFile, authentication.getName()));
     }
 
     @GetMapping(value = "/{ad_pk}/comments",
@@ -92,8 +95,8 @@ public class AdsController {
 
     @GetMapping(value = "/me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ResponseWrapperAds> getAdsMe() {
-        ResponseWrapperAds adsMe = adsService.getAdsMe();
+    public ResponseEntity<ResponseWrapperAds> getAdsMe(Authentication authentication) {
+        ResponseWrapperAds adsMe = adsService.getAdsMe(authentication.getName());
         return ResponseEntity.ok(adsMe);
     }
 
