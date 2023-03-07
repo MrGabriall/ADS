@@ -17,7 +17,7 @@ CREATE TABLE users
     last_name    TEXT       NOT NULL,
     phone        TEXT       NOT NULL,
     email        TEXT       NOT NULL,
-    city         TEXT       NOT NULL,
+    city         TEXT,
     reg_date     TEXT       NOT NULL,
     avatar       INT4,
     role         TEXT

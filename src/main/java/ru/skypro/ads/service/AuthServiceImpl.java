@@ -8,6 +8,7 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import ru.skypro.ads.dto.RegisterReq;
 import ru.skypro.ads.dto.Role;
+import ru.skypro.ads.repository.UserRepository;
 
 
 @Service
@@ -17,9 +18,12 @@ public class AuthServiceImpl implements AuthService {
 
     private final PasswordEncoder encoder;
 
-    public AuthServiceImpl(UserDetailsManager manager) {
+    private final UserService userService;
+
+    public AuthServiceImpl(UserDetailsManager manager, UserService userService) {
         this.manager = manager;
         this.encoder = new BCryptPasswordEncoder();
+        this.userService = userService;
     }
 
     @Override
@@ -27,10 +31,15 @@ public class AuthServiceImpl implements AuthService {
         if (!manager.userExists(userName)) {
             return false;
         }
+        /*
         UserDetails userDetails = manager.loadUserByUsername(userName);
         String encryptedPassword = userDetails.getPassword();
         String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-        return encoder.matches(password, encryptedPasswordWithoutEncryptionType);
+        */
+        if (!userService.userExists(userName, password)) {
+            return false;
+        }
+        return true;//encoder.matches(password, encryptedPasswordWithoutEncryptionType);
     }
 
     @Override
@@ -38,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
         if (manager.userExists(registerReq.getUsername())) {
             return false;
         }
+        /*
         manager.createUser(
                 User.withDefaultPasswordEncoder()
                         .password(registerReq.getPassword())
@@ -45,6 +55,8 @@ public class AuthServiceImpl implements AuthService {
                         .roles(role.name())
                         .build()
         );
+         */
+        userService.createUser(registerReq);
         return true;
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.component.RecordMapper;
+import ru.skypro.ads.dto.RegisterReq;
 import ru.skypro.ads.dto.Role;
 import ru.skypro.ads.dto.UserRecord;
 import ru.skypro.ads.dto.password.NewPassword;
@@ -83,5 +84,20 @@ public class UserService {
     public Pair<byte[], String> getAvatarById(Integer avatarId) {
         Avatar avatar = avatarRepository.findById(avatarId).orElseThrow(AvatarNotFoundException::new);
         return avatarService.getAvatarData(avatar);
+    }
+
+    public void createUser(RegisterReq registerReq) {
+        User user = recordMapper.toEntity(registerReq);
+        user.setRegDate(LocalDate.now().toString());
+        userRepository.save(user);
+    }
+
+    public boolean userExists(String email, String password) {
+        User user = userRepository.findByEmail(email);
+        if (!user.getPassword().equals(password)) {
+            return false;
+        }
+        return true;
+
     }
 }

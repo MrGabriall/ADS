@@ -82,10 +82,14 @@ public class AdsService {
         Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
         return recordMapper.toFullAdsRecord(ads);
     }
-
+//todo написана проверка на роль Админа или совпадение действующего юзера с автором объявления
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void deleteAds(Integer id) {
+    public void deleteAds(Integer id, String email) {
+        User user = userRepository.findByEmail(email);
         Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
+        if (!(user.getRole().equals("USER") && ads.getAuthor().getId() == user.getId()) || !user.getRole().equals("ADMIN")) {
+            return;
+        }
         Image image = ads.getImage();
         if (image != null) {
             if (!imageServiceImpl.deleteImage(image)) {
@@ -95,9 +99,13 @@ public class AdsService {
         commentRepository.removeAllByAds(ads);
         adsRepository.deleteById(id);
     }
-
-    public AdsRecord updateAds(Integer id, CreateAdsReq createAdsReq) {
+//todo checkRole done
+    public AdsRecord updateAds(Integer id, CreateAdsReq createAdsReq, String email) {
+        User user = userRepository.findByEmail(email);
         Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
+        if (!(user.getRole().equals("USER") && ads.getAuthor().getId() == user.getId())) {
+            throw new RuntimeException("К действию updateAds() доступ закрыт.");
+        }
         Ads newAds = recordMapper.toEntity(createAdsReq);
         ads.setDescription(newAds.getDescription());
         ads.setPrice(newAds.getPrice());
@@ -107,6 +115,7 @@ public class AdsService {
     }
 
     public CommentRecord addComment(Integer adsId, CommentRecord commentRecord) {
+
         Ads ads = adsRepository.findById(adsId).orElseThrow(AdsNotFoundException::new);
         User author = userRepository.findById(commentRecord.getAuthorId()).orElseThrow(RuntimeException::new);
         Comment comment = recordMapper.toEntity(commentRecord, ads, author);

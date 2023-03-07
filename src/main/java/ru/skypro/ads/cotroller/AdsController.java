@@ -56,8 +56,9 @@ public class AdsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAds(@PathVariable Integer id) {
-        adsService.deleteAds(id);
+    public ResponseEntity<Void> deleteAds(@PathVariable Integer id,
+                                          Authentication authentication) {
+        adsService.deleteAds(id, authentication.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -65,8 +66,9 @@ public class AdsController {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<AdsRecord> updateAds(@PathVariable Integer id,
-                                               @RequestBody CreateAdsReq createAdsReq) {
-        return ResponseEntity.ok(adsService.updateAds(id, createAdsReq));
+                                               @RequestBody CreateAdsReq createAdsReq,
+                                               Authentication authentication) {
+        return ResponseEntity.ok(adsService.updateAds(id, createAdsReq, authentication.getName()));
     }
 
     @GetMapping(value = "/{ad_pk}/comments/{id}",
