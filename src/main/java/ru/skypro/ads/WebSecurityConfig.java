@@ -1,6 +1,8 @@
 package ru.skypro.ads;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -15,7 +17,12 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class WebSecurityConfig {
-
+    @Value("${spring.datasource.username}")
+    private String usernameDB;
+    @Value("${spring.datasource.password}")
+    private String passwordDB;
+    @Value("${spring.datasource.url}")
+    private String jdbcURl;
     private static final String[] AUTH_WHITELIST = {
             "/swagger-resources/**",
             "/swagger-ui.html",
@@ -25,13 +32,12 @@ public class WebSecurityConfig {
     };
 
     @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user@gmail.com")
-                .password("password")
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(user);
+    public JdbcUserDetailsManager JdbcUserDetailsManager() {
+        DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
+        dataSourceBuilder.url(jdbcURl);
+        dataSourceBuilder.username(usernameDB);
+        dataSourceBuilder.password(passwordDB);
+        return new JdbcUserDetailsManager(dataSourceBuilder.build());
     }
 
     @Bean
