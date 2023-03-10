@@ -11,16 +11,17 @@ CREATE TABLE avatars
 CREATE TABLE users
 (
     id           SERIAL     NOT NULL PRIMARY KEY,
-    username     TEXT,
-    password     TEXT,
-    first_name   TEXT       NOT NULL,
-    last_name    TEXT       NOT NULL,
-    phone        TEXT       NOT NULL,
-    email        TEXT       NOT NULL,
+    email        TEXT,
+    username     TEXT       NOT NULL,
+    password     TEXT       NOT NULL,
+    first_name   TEXT,
+    last_name    TEXT,
+    phone        TEXT,
     city         TEXT,
-    reg_date     TEXT       NOT NULL,
+    reg_date     TEXT,
     avatar       INT4,
-    role         TEXT
+    role         TEXT,
+    enabled      BOOLEAN    NOT NULL
 );
 
 --changeSet eosreign:3
@@ -36,7 +37,7 @@ CREATE TABLE comments
 --changeSet eosreign:4
 CREATE TABLE ads
 (
-    id           SERIAL     NOT NULL PRIMARY KEY,
+    id           SERIAL     PRIMARY KEY,
     image        INT4,
     title        TEXT       NOT NULL,
     author       INT4       NOT NULL,
@@ -52,3 +53,19 @@ CREATE TABLE images
     file_path    TEXT       NOT NULL
 );
 
+--changeSet eosreign:6
+CREATE TABLE authorities
+(
+    id        SERIAL        NOT NULL PRIMARY KEY,
+    username  VARCHAR(30)   NOT NULL,
+    authority VARCHAR(30)   NOT NULL
+);
+
+--changeset eosreign:7
+INSERT INTO authorities (username, authority) VALUES('vsevolod_sol@mail.ru','ROLE_ADMIN');
+
+
+--INSERT INTO users (id, email, username, password, first_name, last_name, phone, reg_date, enabled)
+    --VALUES('0', 'user@gmail.com', 'user@gmail.com','$2a$10$cRqfrdolNVFW6sAju0eNEOE0VC29aIyXwfsEsY2Fz2axy3MnH8ZGa', 'user', 'userovich', '+79819696543', '2023-06-04',1);
+--INSERT INTO users (id, email, username, password, first_name, last_name, phone, reg_date, enabled)
+    --VALUES('1', 'vsevolod_sol@mail.ru', 'vsevolod_sol@mail.ru', '$2a$10$cRqfrdolNVFW6sAju0eNEOE0VC29aIyXwfsEsY2Fz2axy3MnH8ZGa','seva', 'valerievich', '+79819653355', '2023-06-04', 1);

@@ -85,11 +85,19 @@ public class UserService {
         Avatar avatar = avatarRepository.findById(avatarId).orElseThrow(AvatarNotFoundException::new);
         return avatarService.getAvatarData(avatar);
     }
-
+//todo need refactor
     public void createUser(RegisterReq registerReq) {
-        User user = recordMapper.toEntity(registerReq);
-        user.setRegDate(LocalDate.now().toString());
-        userRepository.save(user);
+        User currentUser = userRepository.findByUsername(registerReq.getUsername());
+        User fullUser = new User();
+        fullUser.setId(currentUser.getId());
+        fullUser.setUsername(currentUser.getUsername());
+        fullUser.setPassword(currentUser.getPassword());
+        fullUser.setFirstName(registerReq.getFirstName());
+        fullUser.setLastName(registerReq.getLastName());
+        fullUser.setPhone(registerReq.getPhone());
+        fullUser.setRole(registerReq.getRole());
+        fullUser.setRegDate(LocalDate.now().toString());
+        userRepository.save(fullUser);
     }
 
     public boolean userExists(String email, String password) {

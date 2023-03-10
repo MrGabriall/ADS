@@ -117,8 +117,6 @@ public class RecordMapper {
 //todo Bullshit with username. in Swagger API Documentation class User dont have parameter username
     public User toEntity(RegisterReq registerReq) {
         User user = new User();
-        //so email is username?
-        user.setUserName(registerReq.getUsername());
         user.setEmail(registerReq.getUsername());
         user.setFirstName(registerReq.getFirstName());
         user.setLastName(registerReq.getLastName());

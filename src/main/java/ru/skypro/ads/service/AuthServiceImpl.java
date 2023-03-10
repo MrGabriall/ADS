@@ -1,5 +1,7 @@
 package ru.skypro.ads.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,11 +16,15 @@ import ru.skypro.ads.repository.UserRepository;
 @Service
 public class AuthServiceImpl implements AuthService {
 
+    private static Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
+
     private final UserDetailsManager manager;
 
     private final PasswordEncoder encoder;
 
     private final UserService userService;
+
+    private final String PASS_PREFIX = "{bcrypt}";
 
     public AuthServiceImpl(UserDetailsManager manager, UserService userService) {
         this.manager = manager;
@@ -27,36 +33,39 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public boolean login(String userName, String password) {
-        if (!manager.userExists(userName)) {
+    public boolean login(String username, String password) {
+        log.info("Starting logging: " + username);
+        if (!manager.userExists(username)) {
+            log.error("Error. Username: " + username + "doesn't exist.");
             return false;
         }
-        /*
-        UserDetails userDetails = manager.loadUserByUsername(userName);
+        UserDetails userDetails = manager.loadUserByUsername(username);
         String encryptedPassword = userDetails.getPassword();
         String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-        */
-        if (!userService.userExists(userName, password)) {
+        if (!encoder.matches(password, encryptedPasswordWithoutEncryptionType)) {
+            log.error("Error. Entered wrong password");
             return false;
         }
-        return true;//encoder.matches(password, encryptedPasswordWithoutEncryptionType);
+        log.info("Logging: " + username + " - completed successfully.");
+        return true;
     }
-
+//todo добавить исключения
     @Override
     public boolean register(RegisterReq registerReq, Role role) {
+        log.info("Starting process registration: " + registerReq.getUsername());
         if (manager.userExists(registerReq.getUsername())) {
+            log.error("Error. This username: " +  registerReq.getUsername() + " - is already exist.");
             return false;
         }
-        /*
         manager.createUser(
                 User.withDefaultPasswordEncoder()
-                        .password(registerReq.getPassword())
+                        .password(PASS_PREFIX + encoder.encode(registerReq.getPassword()))
                         .username(registerReq.getUsername())
-                        .roles(role.name())
+                        .roles(Role.USER.name())
                         .build()
         );
-         */
         userService.createUser(registerReq);
+        log.info("Registration " + registerReq.getUsername() + " is successfully complete");
         return true;
     }
 }

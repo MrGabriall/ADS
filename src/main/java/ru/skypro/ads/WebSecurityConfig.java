@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import javax.sql.DataSource;
+
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
@@ -27,12 +29,9 @@ public class WebSecurityConfig {
     };
 
     @Bean
-    public JdbcUserDetailsManager JdbcUserDetailsManager() {
-        DataSourceBuilder<?> dataSourceBuilder = DataSourceBuilder.create();
-        dataSourceBuilder.url(jdbcURl);
-        dataSourceBuilder.username(usernameDB);
-        dataSourceBuilder.password(passwordDB);
-        return new JdbcUserDetailsManager(dataSourceBuilder.build());
+    public JdbcUserDetailsManager users(DataSource dataSource) {
+        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
+        return jdbcUserDetailsManager;
     }
 
     @Bean
