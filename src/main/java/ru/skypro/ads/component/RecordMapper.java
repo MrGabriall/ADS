@@ -4,6 +4,9 @@ import org.springframework.stereotype.Component;
 import ru.skypro.ads.dto.*;
 import ru.skypro.ads.entity.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Component
 public class RecordMapper {
 
@@ -12,7 +15,6 @@ public class RecordMapper {
         user.setId(userRecord.getId());
         user.setFirstName(userRecord.getFirstName());
         user.setLastName(userRecord.getLastName());
-        user.setEmail(userRecord.getEmail());
         user.setPhone(userRecord.getPhone());
         user.setCity(userRecord.getCity());
         user.setRegDate(userRecord.getRegDate());
@@ -33,9 +35,6 @@ public class RecordMapper {
         userRecord.setRegDate(user.getRegDate());
         userRecord.setAvatarPath(toRecord(user.getAvatar()).getAvatarUrl());
 
-        if (user.getEmail() != null) {
-            userRecord.setEmail(user.getEmail());
-        }
         if (user.getCity() != null) {
             userRecord.setCity(user.getCity());
         }
@@ -44,11 +43,11 @@ public class RecordMapper {
 
     public Comment toEntity(CommentRecord commentRecord, Ads ads, User author) {
         Comment comment = new Comment();
-        comment.setId(commentRecord.getPk());
+        //comment.setId(commentRecord.getPk());
         comment.setAds(ads);
         comment.setAuthor(author);
         comment.setText(commentRecord.getText());
-        comment.setCreatedAt(commentRecord.getCreatedAt());
+        comment.setCreatedAt(LocalDateTime.now().toString());
         return comment;
     }
 
@@ -93,7 +92,6 @@ public class RecordMapper {
         fullAdsRecord.setAuthorFirstName(ads.getAuthor().getFirstName());
         fullAdsRecord.setAuthorLastName(ads.getAuthor().getLastName());
         fullAdsRecord.setPhone(ads.getAuthor().getPhone());
-        fullAdsRecord.setEmail(ads.getAuthor().getEmail());
         return fullAdsRecord;
     }
 
@@ -114,15 +112,17 @@ public class RecordMapper {
         }
         return avatarRecord;
     }
-//todo Bullshit with username. in Swagger API Documentation class User dont have parameter username
+//todo setRegDate*!
     public User toEntity(RegisterReq registerReq) {
         User user = new User();
-        user.setEmail(registerReq.getUsername());
+        user.setUsername(registerReq.getUsername());
         user.setFirstName(registerReq.getFirstName());
         user.setLastName(registerReq.getLastName());
         user.setPhone(registerReq.getPhone());
         user.setPassword(registerReq.getPassword());
         user.setRole(registerReq.getRole());
+        user.setRegDate(LocalDate.now().toString());
+        user.setEnabled(true);
         return user;
     }
 }

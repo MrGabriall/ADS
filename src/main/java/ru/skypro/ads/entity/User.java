@@ -19,9 +19,6 @@ public class User {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "email")
-    private String email;
-
     @Column(name = "first_name")
     private String firstName;
 
@@ -43,6 +40,9 @@ public class User {
     @OneToOne
     @JoinColumn(name = "avatar")
     private Avatar avatar;
+
+    @Column(name = "enabled")
+    private boolean enabled;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")

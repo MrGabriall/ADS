@@ -11,8 +11,7 @@ CREATE TABLE avatars
 CREATE TABLE users
 (
     id           SERIAL     NOT NULL PRIMARY KEY,
-    email        TEXT,
-    username     TEXT       NOT NULL,
+    username     TEXT       NOT NULL UNIQUE,
     password     TEXT       NOT NULL,
     first_name   TEXT,
     last_name    TEXT,
@@ -65,7 +64,9 @@ CREATE TABLE authorities
 INSERT INTO authorities (username, authority) VALUES('vsevolod_sol@mail.ru','ROLE_ADMIN');
 
 
+
+
 --INSERT INTO users (id, email, username, password, first_name, last_name, phone, reg_date, enabled)
-    --VALUES('0', 'user@gmail.com', 'user@gmail.com','$2a$10$cRqfrdolNVFW6sAju0eNEOE0VC29aIyXwfsEsY2Fz2axy3MnH8ZGa', 'user', 'userovich', '+79819696543', '2023-06-04',1);
+    --VALUES('0', 'user@gmail.com','$2a$10$cRqfrdolNVFW6sAju0eNEOE0VC29aIyXwfsEsY2Fz2axy3MnH8ZGa', 'user', 'userovich', '+79819696543', '2023-06-04',1);
 --INSERT INTO users (id, email, username, password, first_name, last_name, phone, reg_date, enabled)
-    --VALUES('1', 'vsevolod_sol@mail.ru', 'vsevolod_sol@mail.ru', '$2a$10$cRqfrdolNVFW6sAju0eNEOE0VC29aIyXwfsEsY2Fz2axy3MnH8ZGa','seva', 'valerievich', '+79819653355', '2023-06-04', 1);
+    --VALUES('1', 'vsevolod_sol@mail.ru', '$2a$10$cRqfrdolNVFW6sAju0eNEOE0VC29aIyXwfsEsY2Fz2axy3MnH8ZGa','seva', 'valerievich', '+79819653355', '2023-06-04', 1);

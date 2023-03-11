@@ -4,6 +4,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
@@ -45,9 +46,11 @@ public class AdsController {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<CommentRecord> addComments(@PathVariable("ad_pk") Integer adPk,
-                                                     @RequestBody CommentRecord commentRecord) {
-        return ResponseEntity.ok(adsService.addComment(adPk, commentRecord));
+                                                     @RequestBody CommentRecord commentRecord,
+                                                     Authentication authentication) {
+        return ResponseEntity.ok(adsService.addComment(adPk, commentRecord, authentication.getName()));
     }
+
 
     @GetMapping(value = "/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -56,9 +59,9 @@ public class AdsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAds(@PathVariable Integer id,
+    public ResponseEntity<Void> deleteAds(@PathVariable("id") Integer adsId,
                                           Authentication authentication) {
-        adsService.deleteAds(id, authentication.getName());
+        adsService.deleteAds(adsId, authentication.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -80,8 +83,9 @@ public class AdsController {
 
     @DeleteMapping("/{ad_pk}/comments/{id}")
     public ResponseEntity<Void> deleteComments(@PathVariable("ad_pk") Integer adPk,
-                                               @PathVariable Integer id) {
-        adsService.deleteComment(adPk, id);
+                                               @PathVariable Integer id,
+                                               Authentication authentication) {
+        adsService.deleteComment(adPk, id, authentication.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -90,8 +94,9 @@ public class AdsController {
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<CommentRecord> updateComments(@PathVariable("ad_pk") Integer adPk,
                                                         @PathVariable Integer id,
-                                                        @RequestBody CommentRecord commentRecord) {
-        return ResponseEntity.ok(adsService.updateComment(adPk, id, commentRecord));
+                                                        @RequestBody CommentRecord commentRecord,
+                                                        Authentication authentication) {
+        return ResponseEntity.ok(adsService.updateComment(adPk, id, commentRecord, authentication.getName()));
     }
 
 
@@ -105,8 +110,10 @@ public class AdsController {
     @PatchMapping(value = "/{id}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<byte[]> updateAdsImage(@PathVariable("id") Integer idAds, @RequestPart("image") MultipartFile image) {
-        Pair<byte[], String> pair = adsService.updateAdsImage(idAds, image);
+    public ResponseEntity<byte[]> updateAdsImage(@PathVariable("id") Integer idAds,
+                                                 @RequestPart("image") MultipartFile image,
+                                                 Authentication authentication) {
+        Pair<byte[], String> pair = adsService.updateAdsImage(idAds, image, authentication.getName());
         return ResponseEntity.ok()
                 .contentLength(pair.getFirst().length)
                 .contentType(MediaType.parseMediaType(pair.getSecond()))

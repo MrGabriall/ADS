@@ -8,9 +8,11 @@ import ru.skypro.ads.dto.RegisterReq;
 import ru.skypro.ads.dto.Role;
 import ru.skypro.ads.dto.UserRecord;
 import ru.skypro.ads.dto.password.NewPassword;
+import ru.skypro.ads.entity.Authority;
 import ru.skypro.ads.entity.Avatar;
 import ru.skypro.ads.entity.User;
 import ru.skypro.ads.exception.AvatarNotFoundException;
+import ru.skypro.ads.repository.AuthorityRepository;
 import ru.skypro.ads.repository.AvatarRepository;
 import ru.skypro.ads.repository.UserRepository;
 
@@ -23,13 +25,15 @@ public class UserService {
     private final RecordMapper recordMapper;
     private final AvatarService avatarService;
     private final AvatarRepository avatarRepository;
+    private final AuthorityRepository authorityRepository;
 
     public UserService(UserRepository userRepository, RecordMapper recordMapper, AvatarService avatarService,
-                       AvatarRepository avatarRepository) {
+                       AvatarRepository avatarRepository, AuthorityRepository authorityRepository) {
         this.userRepository = userRepository;
         this.recordMapper = recordMapper;
         this.avatarService = avatarService;
         this.avatarRepository = avatarRepository;
+        this.authorityRepository = authorityRepository;
     }
 /*
     private User getSingleUser() {
@@ -87,25 +91,19 @@ public class UserService {
     }
 //todo need refactor
     public void createUser(RegisterReq registerReq) {
-        User currentUser = userRepository.findByUsername(registerReq.getUsername());
-        User fullUser = new User();
-        fullUser.setId(currentUser.getId());
-        fullUser.setUsername(currentUser.getUsername());
-        fullUser.setPassword(currentUser.getPassword());
-        fullUser.setFirstName(registerReq.getFirstName());
-        fullUser.setLastName(registerReq.getLastName());
-        fullUser.setPhone(registerReq.getPhone());
-        fullUser.setRole(registerReq.getRole());
-        fullUser.setRegDate(LocalDate.now().toString());
-        userRepository.save(fullUser);
+        User newUser = recordMapper.toEntity(registerReq);
+        Authority auth = new Authority();
+        auth.setUsername(registerReq.getUsername());
+        auth.setRole(Role.ROLE_USER.toString());
+        authorityRepository.save(auth);
+        userRepository.save(newUser);
     }
 
-    public boolean userExists(String username, String password) {
-        User user = userRepository.findByUsername(username);
-        if (!user.getPassword().equals(password)) {
+    public boolean userExists(String username) {
+        if (userRepository.existsUserByUsername(username)) {
+            return true;
+        } else {
             return false;
         }
-        return true;
-
     }
 }

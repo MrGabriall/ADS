@@ -1,6 +1,7 @@
 package ru.skypro.ads.service;
 
 import org.springframework.data.util.Pair;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,17 +57,17 @@ public class AdsService {
         }
         return new ResponseWrapperAds(listAdsRecords.size(), listAdsRecords);
     }
-//todo добавлен parameter email
-    public AdsRecord addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile, String email) {
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
+    public AdsRecord addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile, String username) {
         Ads ads = recordMapper.toEntity(createAdsReq);
-        UserRecord user = recordMapper.toRecord(userRepository.findByEmail(email));
+        UserRecord user = recordMapper.toRecord(userRepository.findByUsername(username));
         ads.setAuthor(recordMapper.toEntity(user));
         ads = adsRepository.save(ads);
         ads.setImage(imageServiceImpl.addImage(ads, multipartFile));
         ads = adsRepository.save(ads);
         return recordMapper.toRecord(ads);
     }
-
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
     public ResponseWrapperComment getAllCommentsByAdsId(Integer adsId) {
         List<CommentRecord> list = new ArrayList<>();
         Ads ads = adsRepository.findAdsById(adsId);
@@ -77,19 +78,16 @@ public class AdsService {
         }
         return new ResponseWrapperComment(list.size(), list);
     }
-
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
     public FullAdsRecord getFullAds(Integer id) {
         Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
         return recordMapper.toFullAdsRecord(ads);
     }
-//todo написана проверка на роль Админа или совпадение действующего юзера с автором объявления
+
+    @PreAuthorize("@adsService.isAdsAuthor(#adsId, #username) or hasAuthority('ROLE_ADMIN')")
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void deleteAds(Integer id, String email) {
-        User user = userRepository.findByEmail(email);
-        Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
-        if (!(user.getRole().equals("USER") && ads.getAuthor().getId() == user.getId()) || !user.getRole().equals("ADMIN")) {
-            return;
-        }
+    public void deleteAds(Integer adsId, String username) {
+        Ads ads = adsRepository.findById(adsId).orElseThrow(AdsNotFoundException::new);
         Image image = ads.getImage();
         if (image != null) {
             if (!imageServiceImpl.deleteImage(image)) {
@@ -97,15 +95,12 @@ public class AdsService {
             }
         }
         commentRepository.removeAllByAds(ads);
-        adsRepository.deleteById(id);
+        adsRepository.deleteById(adsId);
     }
-//todo checkRole done
-    public AdsRecord updateAds(Integer id, CreateAdsReq createAdsReq, String email) {
-        User user = userRepository.findByEmail(email);
+
+    @PreAuthorize("@adsService.isAdsAuthor(#id, #username) or hasAuthority('ROLE_ADMIN')")
+    public AdsRecord updateAds(Integer id, CreateAdsReq createAdsReq, String username) {
         Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
-        if (!(user.getRole().equals("USER") && ads.getAuthor().getId() == user.getId())) {
-            throw new RuntimeException("К действию updateAds() доступ закрыт.");
-        }
         Ads newAds = recordMapper.toEntity(createAdsReq);
         ads.setDescription(newAds.getDescription());
         ads.setPrice(newAds.getPrice());
@@ -114,15 +109,16 @@ public class AdsService {
         return recordMapper.toRecord(ads);
     }
 
-    public CommentRecord addComment(Integer adsId, CommentRecord commentRecord) {
-
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
+    public CommentRecord addComment(Integer adsId, CommentRecord commentRecord, String username) {
         Ads ads = adsRepository.findById(adsId).orElseThrow(AdsNotFoundException::new);
-        User author = userRepository.findById(commentRecord.getAuthorId()).orElseThrow(RuntimeException::new);
+        User author = userRepository.findByUsername(username);
         Comment comment = recordMapper.toEntity(commentRecord, ads, author);
         comment = commentRepository.save(comment);
         return recordMapper.toRecord(comment);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
     public CommentRecord getAdsComment(Integer adPk, Integer commentId) {
         Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
         Comment comment = commentRepository.findCommentByAdsAndId(ads, commentId)
@@ -130,14 +126,16 @@ public class AdsService {
         return recordMapper.toRecord(comment);
     }
 
-    public void deleteComment(Integer adPk, Integer id) {
+    @PreAuthorize("@adsService.isCommentAuthor(#id, #username) or hasAuthority('ROLE_ADMIN')")
+    public void deleteComment(Integer adPk, Integer id, String username) {
         Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
-        if (!commentRepository.deleteByAdsAndId(ads, id)) {
+        if (!commentRepository.removeCommentById(id)) {
             throw new CommentNotFoundException();
         }
     }
 
-    public CommentRecord updateComment(Integer adPk, Integer id, CommentRecord commentRecord) {
+    @PreAuthorize("@adsService.isCommentAuthor(#id, #username) or hasAuthority('ROLE_ADMIN')")
+    public CommentRecord updateComment(Integer adPk, Integer id, CommentRecord commentRecord, String username) {
         Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
         Comment oldComment = commentRepository.findCommentByAdsAndId(ads, id)
                 .orElseThrow(CommentNotFoundException::new);
@@ -146,13 +144,15 @@ public class AdsService {
         return recordMapper.toRecord(oldComment);
     }
 
-    public Pair<byte[], String> updateAdsImage(Integer idAds, MultipartFile image) {
+    @PreAuthorize("@adsService.isAdsAuthor(#idAds, #username) or hasAuthority('ROLE_ADMIN')")
+    public Pair<byte[], String> updateAdsImage(Integer idAds, MultipartFile image, String username) {
         Ads ads = adsRepository.findById(idAds).orElseThrow(AdsNotFoundException::new);
         Image oldImage = imageRepository.findByAdsId(ads);
         Image newImage = imageServiceImpl.updateImage(ads, oldImage, image);
         return imageServiceImpl.getImageData(newImage);
     }
-//todo добавлен параметер email
+
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
     public ResponseWrapperAds getAdsMe(String username) {
         List<AdsRecord> list = new ArrayList<>();
 
@@ -170,5 +170,14 @@ public class AdsService {
         Image image = imageRepository.findById(uniqId).orElseThrow(ImageNotFoundException::new);
         return imageServiceImpl.getImageData(image);
     }
+
+    public boolean isAdsAuthor(Integer adsId, String username) {
+        return adsRepository.existsByIdAndAuthor_Username(adsId, username);
+    }
+
+    public boolean isCommentAuthor(Integer commentId, String username) {
+        return commentRepository.existsByIdAndAuthor_Username(commentId, username);
+    }
+
 
 }
