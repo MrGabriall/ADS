@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
                         .roles(Role.USER.name())
                         .build()
         );
-        userService.createUser(registerReq);
+        userService.updateUser(registerReq);
         log.info("Registration " + registerReq.getUsername() + " is successfully complete");
         return true;
     }

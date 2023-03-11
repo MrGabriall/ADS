@@ -1,11 +1,12 @@
 package ru.skypro.ads.service;
 
 import org.springframework.data.util.Pair;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.component.RecordMapper;
 import ru.skypro.ads.dto.RegisterReq;
-import ru.skypro.ads.dto.Role;
 import ru.skypro.ads.dto.UserRecord;
 import ru.skypro.ads.dto.password.NewPassword;
 import ru.skypro.ads.entity.Avatar;
@@ -23,33 +24,16 @@ public class UserService {
     private final RecordMapper recordMapper;
     private final AvatarService avatarService;
     private final AvatarRepository avatarRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository, RecordMapper recordMapper, AvatarService avatarService,
-                       AvatarRepository avatarRepository) {
+                       AvatarRepository avatarRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.recordMapper = recordMapper;
         this.avatarService = avatarService;
         this.avatarRepository = avatarRepository;
+        this.passwordEncoder = passwordEncoder;
     }
-/*
-    private User getSingleUser() {
-        if (user == null) {
-            user = new User();
-            user.setId(1);
-            user.setFirstName("Работяга");
-            user.setLastName("Дефолтный");
-            user.setEmail("user@gmail.com");
-            user.setPhone("+79881234567");
-            user.setCity("Сочи");
-            user.setRegDate(LocalDate.now().toString());
-            user.setUserName("User");
-            user.setPassword("password");
-            user.setRole(Role.ADMIN);
-            user = userRepository.save(user);
-        }
-        return user;
-    }
- */
 //todo username added
     public UserRecord getUser(String username) {
         return recordMapper.toRecord(userRepository.findByUsername(username));
@@ -57,10 +41,12 @@ public class UserService {
 
 //todo должен быть второй параметр  - username!
     public NewPassword setPassword(NewPassword newPassword, String username) {
-        User singleUser = userRepository.findByUsername(username);
-        if (singleUser.getPassword().equals(newPassword.getCurrentPassword())) {
-            singleUser.setPassword(newPassword.getNewPassword());
-            userRepository.save(singleUser);
+        User user = userRepository.findByUsername(username);
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        if (passwordEncoder.matches(newPassword.getCurrentPassword(), user.getPassword())) {
+            String encodePassword = bCryptPasswordEncoder.encode(newPassword.getNewPassword());
+            user.setPassword(encodePassword.substring(8));
+            userRepository.save(user);
         }
         return newPassword;
     }
@@ -85,8 +71,7 @@ public class UserService {
         Avatar avatar = avatarRepository.findById(avatarId).orElseThrow(AvatarNotFoundException::new);
         return avatarService.getAvatarData(avatar);
     }
-//todo need refactor
-    public void createUser(RegisterReq registerReq) {
+    public void updateUser(RegisterReq registerReq) {
         User currentUser = userRepository.findByUsername(registerReq.getUsername());
         User fullUser = new User();
         fullUser.setId(currentUser.getId());
@@ -98,14 +83,5 @@ public class UserService {
         fullUser.setRole(registerReq.getRole());
         fullUser.setRegDate(LocalDate.now().toString());
         userRepository.save(fullUser);
-    }
-
-    public boolean userExists(String username, String password) {
-        User user = userRepository.findByUsername(username);
-        if (!user.getPassword().equals(password)) {
-            return false;
-        }
-        return true;
-
     }
 }
