@@ -4,13 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import ru.skypro.ads.dto.RegisterReq;
 import ru.skypro.ads.dto.Role;
-import ru.skypro.ads.repository.UserRepository;
+
 
 
 @Service
@@ -24,11 +23,10 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserService userService;
 
-    private final String PASS_PREFIX = "{bcrypt}";
 
-    public AuthServiceImpl(UserDetailsManager manager, UserService userService) {
+    public AuthServiceImpl(UserDetailsManager manager, UserService userService, PasswordEncoder encoder) {
         this.manager = manager;
-        this.encoder = new BCryptPasswordEncoder();
+        this.encoder = encoder;
         this.userService = userService;
     }
 
@@ -36,14 +34,14 @@ public class AuthServiceImpl implements AuthService {
     public boolean login(String username, String password) {
         log.info("Starting logging: " + username);
         if (!manager.userExists(username)) {
-            log.error("Error. Username: " + username + "doesn't exist.");
+            log.warn("Error. Username: " + username + "doesn't exist.");
             return false;
         }
         UserDetails userDetails = manager.loadUserByUsername(username);
         String encryptedPassword = userDetails.getPassword();
         String encryptedPasswordWithoutEncryptionType = encryptedPassword.substring(8);
-        if (!encoder.matches(password, encryptedPasswordWithoutEncryptionType)) {
-            log.error("Error. Entered wrong password");
+        if (!encoder.matches(password, encryptedPassword)) {
+            log.warn("Error. Entered wrong password");
             return false;
         }
         log.info("Logging: " + username + " - completed successfully.");
@@ -54,12 +52,12 @@ public class AuthServiceImpl implements AuthService {
     public boolean register(RegisterReq registerReq, Role role) {
         log.info("Starting process registration: " + registerReq.getUsername());
         if (manager.userExists(registerReq.getUsername())) {
-            log.error("Error. This username: " +  registerReq.getUsername() + " - is already exist.");
+            log.warn("Error. This username: " +  registerReq.getUsername() + " - is already exist.");
             return false;
         }
         manager.createUser(
                 User.withDefaultPasswordEncoder()
-                        .password(PASS_PREFIX + encoder.encode(registerReq.getPassword()))
+                        .password(registerReq.getPassword().substring(8))
                         .username(registerReq.getUsername())
                         .roles(Role.USER.name())
                         .build()

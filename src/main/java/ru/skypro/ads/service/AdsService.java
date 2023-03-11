@@ -153,10 +153,10 @@ public class AdsService {
         return imageServiceImpl.getImageData(newImage);
     }
 //todo добавлен параметер email
-    public ResponseWrapperAds getAdsMe(String email) {
+    public ResponseWrapperAds getAdsMe(String username) {
         List<AdsRecord> list = new ArrayList<>();
 
-        UserRecord userRecord = recordMapper.toRecord(userRepository.findByEmail(email));
+        UserRecord userRecord = recordMapper.toRecord(userRepository.findByUsername(username));
         User user = recordMapper.toEntity(userRecord);
 
         List<Ads> listAds = adsRepository.findAllByAuthorId(user.getId());

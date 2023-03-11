@@ -50,24 +50,24 @@ public class UserService {
         return user;
     }
  */
-//todo email added
-    public UserRecord getUser(String email) {
-        return recordMapper.toRecord(userRepository.findByEmail(email));
+//todo username added
+    public UserRecord getUser(String username) {
+        return recordMapper.toRecord(userRepository.findByUsername(username));
     }
 
-//todo должен быть второй параметр  - email!
-    public NewPassword setPassword(NewPassword newPassword, String email) {
-        User singleUser = userRepository.findByEmail(email);
+//todo должен быть второй параметр  - username!
+    public NewPassword setPassword(NewPassword newPassword, String username) {
+        User singleUser = userRepository.findByUsername(username);
         if (singleUser.getPassword().equals(newPassword.getCurrentPassword())) {
             singleUser.setPassword(newPassword.getNewPassword());
             userRepository.save(singleUser);
         }
         return newPassword;
     }
-//todo должен быть второй параметр  - email! Везде где имеется getSingleUser применить userRepository.findByEmail()
-    public UserRecord updateUser(UserRecord userRecord, String email) {
+
+    public UserRecord updateUser(UserRecord userRecord, String username) {
         User userEntity = recordMapper.toEntity(userRecord);
-        User currentUser = userRepository.findByEmail(email);
+        User currentUser = userRepository.findByUsername(username);
         currentUser.setFirstName(userEntity.getFirstName());
         currentUser.setLastName(userEntity.getLastName());
         currentUser.setPhone(userEntity.getPhone());
@@ -75,8 +75,8 @@ public class UserService {
         return recordMapper.toRecord(user);
     }
 
-    public void updateUserImage(MultipartFile image, String email) {
-        User currentUser = userRepository.findByEmail(email);
+    public void updateUserImage(MultipartFile image, String username) {
+        User currentUser = userRepository.findByUsername(username);
         currentUser.setAvatar(avatarService.updateAvatar(currentUser.getAvatar(), image));
         user = userRepository.save(currentUser);
     }
@@ -100,8 +100,8 @@ public class UserService {
         userRepository.save(fullUser);
     }
 
-    public boolean userExists(String email, String password) {
-        User user = userRepository.findByEmail(email);
+    public boolean userExists(String username, String password) {
+        User user = userRepository.findByUsername(username);
         if (!user.getPassword().equals(password)) {
             return false;
         }
