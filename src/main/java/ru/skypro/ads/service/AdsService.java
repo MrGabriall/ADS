@@ -128,10 +128,11 @@ public class AdsService {
 
     @PreAuthorize("@adsService.isCommentAuthor(#id, #username) or hasAuthority('ROLE_ADMIN')")
     public void deleteComment(Integer adPk, Integer id, String username) {
-        Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
-        if (!commentRepository.removeCommentById(id)) {
+        adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        if (!commentRepository.existsById(id)) {
             throw new CommentNotFoundException();
         }
+        commentRepository.deleteById(id);
     }
 
     @PreAuthorize("@adsService.isCommentAuthor(#id, #username) or hasAuthority('ROLE_ADMIN')")

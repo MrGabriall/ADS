@@ -49,11 +49,11 @@ public class AuthServiceImpl implements AuthService {
         log.info("Logging: " + username + " - completed successfully.");
         return true;
     }
-//todo добавить исключения
+
     @Override
     public boolean register(RegisterReq registerReq, Role role) {
         log.info("Starting process registration: " + registerReq.getUsername());
-        if (manager.userExists(registerReq.getUsername())) {
+        if (!userRepository.existsUserByUsername(registerReq.getUsername())) {
             log.warn("Error. This username: " +  registerReq.getUsername() + " - is already exist.");
             return false;
         }

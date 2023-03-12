@@ -56,12 +56,10 @@ CREATE TABLE images
 CREATE TABLE authorities
 (
     id        SERIAL        NOT NULL PRIMARY KEY,
-    username  VARCHAR(30)   NOT NULL,
+    username  VARCHAR(30)   NOT NULL UNIQUE,
     authority VARCHAR(30)   NOT NULL
 );
 
---changeset eosreign:7
-INSERT INTO authorities (username, authority) VALUES('vsevolod_sol@mail.ru','ROLE_ADMIN');
 
 
 

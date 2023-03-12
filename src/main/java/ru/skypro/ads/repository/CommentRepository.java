@@ -16,9 +16,9 @@ public interface CommentRepository extends JpaRepository<Comment, Integer> {
     void removeAllByAds(Ads ads);
 
     Optional<Comment> findCommentByAdsAndId(Ads adsId, Integer id);
-
+    
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    boolean removeCommentById(Integer id);
+    Integer removeCommentById(Integer id);
 
     List<Comment> findAllByAds(Ads ads);
 
