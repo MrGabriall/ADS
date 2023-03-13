@@ -3,6 +3,8 @@ package ru.skypro.ads.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.component.ImageWriter;
 import ru.skypro.ads.entity.Ads;
@@ -26,11 +28,11 @@ public class ImageServiceImpl {
     }
 
     public Image updateImage(Ads ads, Image image, MultipartFile file) {
-        checkImage(image);
-
-        if (deleteImage(image)) {
-            return addImage(ads, file);
-        } else return image;
+        if (image != null) {
+            checkImage(image);
+            deleteImage(image);
+        }
+        return addImage(ads, file);
     }
 
     public Pair<byte[], String> getImageData(Image image) {
@@ -38,6 +40,7 @@ public class ImageServiceImpl {
         return imageWriter.getImage(image.getFilePath());
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean deleteImage(Image image) {
         imageRepository.delete(image);
         boolean isDeleted = imageWriter.deleteImage(Path.of(image.getFilePath()));
@@ -55,8 +58,7 @@ public class ImageServiceImpl {
     }
 
     private void checkImage(Image image) {
-        if (image == null || image.getId() == null ||
-                imageRepository.findById(image.getId()).isEmpty()) {
+        if (image.getId() == null || imageRepository.findById(image.getId()).isEmpty()) {
             throw new ImageNotFoundException();
         }
     }

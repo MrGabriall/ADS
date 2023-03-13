@@ -112,7 +112,6 @@ public class RecordMapper {
         }
         return avatarRecord;
     }
-//todo setRegDate*!
     public User toEntity(RegisterReq registerReq) {
         User user = new User();
         user.setUsername(registerReq.getUsername());

@@ -31,20 +31,17 @@ public class AdsService {
     private final RecordMapper recordMapper;
     private final ImageServiceImpl imageServiceImpl;
     private final ImageRepository imageRepository;
-    private final UserService userService;
     private final UserRepository userRepository;
 
     public AdsService(AdsRepository adsRepository,
                       CommentRepository commentRepository,
                       RecordMapper recordMapper, ImageServiceImpl imageServiceImpl,
-                      ImageRepository imageRepository, UserService userService,
-                      UserRepository userRepository) {
+                      ImageRepository imageRepository, UserRepository userRepository) {
         this.adsRepository = adsRepository;
         this.commentRepository = commentRepository;
         this.recordMapper = recordMapper;
         this.imageServiceImpl = imageServiceImpl;
         this.imageRepository = imageRepository;
-        this.userService = userService;
         this.userRepository = userRepository;
     }
 
@@ -57,6 +54,7 @@ public class AdsService {
         }
         return new ResponseWrapperAds(listAdsRecords.size(), listAdsRecords);
     }
+
     @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
     public AdsRecord addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile, String username) {
         Ads ads = recordMapper.toEntity(createAdsReq);
@@ -67,6 +65,7 @@ public class AdsService {
         ads = adsRepository.save(ads);
         return recordMapper.toRecord(ads);
     }
+
     @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
     public ResponseWrapperComment getAllCommentsByAdsId(Integer adsId) {
         List<CommentRecord> list = new ArrayList<>();
@@ -78,6 +77,7 @@ public class AdsService {
         }
         return new ResponseWrapperComment(list.size(), list);
     }
+
     @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
     public FullAdsRecord getFullAds(Integer id) {
         Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
@@ -148,8 +148,10 @@ public class AdsService {
     @PreAuthorize("@adsService.isAdsAuthor(#idAds, #username) or hasAuthority('ROLE_ADMIN')")
     public Pair<byte[], String> updateAdsImage(Integer idAds, MultipartFile image, String username) {
         Ads ads = adsRepository.findById(idAds).orElseThrow(AdsNotFoundException::new);
-        Image oldImage = imageRepository.findByAdsId(ads);
+        Image oldImage = imageRepository.findByAdsId(ads.getId());
         Image newImage = imageServiceImpl.updateImage(ads, oldImage, image);
+        ads.setImage(newImage);
+        adsRepository.save(ads);
         return imageServiceImpl.getImageData(newImage);
     }
 

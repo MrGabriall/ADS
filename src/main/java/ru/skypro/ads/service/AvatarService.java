@@ -43,7 +43,7 @@ public class AvatarService {
 
     public Avatar addAvatar(Avatar avatar, MultipartFile file) {
         Path path = imageWriter.writeImage(file, avatarsDir);
-        if (avatar == null){
+        if (avatar == null) {
             avatar = new Avatar();
         }
         avatar.setFilePath(path.toString());
