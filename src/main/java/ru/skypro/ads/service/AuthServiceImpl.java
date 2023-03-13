@@ -12,12 +12,8 @@ import ru.skypro.ads.repository.UserRepository;
 
 @Service
 public class AuthServiceImpl implements AuthService {
-
     private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
-
-
     private final PasswordEncoder encoder;
-
     private final UserService userService;
     private final UserRepository userRepository;
 
@@ -31,32 +27,28 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public boolean login(String username, String password) {
-        log.info("Starting logging: " + username);
         if (!userService.userExists(username)) {
-            log.warn("Error. Username: " + username + " doesn't exist.");
+            log.warn("Error: " + username + " doesn't exist.");
             return false;
         }
         User user = userRepository.findByUsername(username);
         String encryptedPassword = user.getPassword();
 
         if (!encoder.matches(password, encryptedPassword)) {
-            log.warn("Error. Entered wrong password");
+            log.warn("Error: " + username + " Entered wrong password.");
             return false;
         }
-        log.info("Logging: " + username + " - completed successfully.");
         return true;
     }
 
     @Override
     public boolean register(RegisterReq registerReq, Role role) {
-        log.info("Starting process registration: " + registerReq.getUsername());
         if (userRepository.existsUserByUsername(registerReq.getUsername())) {
-            log.warn("Error. This username: " + registerReq.getUsername() + " - is already exist.");
+            log.warn("Error: " + registerReq.getUsername() + " - is already exist.");
             return false;
         }
         registerReq.setPassword(encoder.encode(registerReq.getPassword()));
         userService.createUser(registerReq);
-        log.info("Registration " + registerReq.getUsername() + " is successfully complete");
         return true;
     }
 }

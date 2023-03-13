@@ -16,8 +16,6 @@ import ru.skypro.ads.repository.AuthorityRepository;
 import ru.skypro.ads.repository.AvatarRepository;
 import ru.skypro.ads.repository.UserRepository;
 
-import java.time.LocalDate;
-
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -35,36 +33,16 @@ public class UserService {
         this.avatarRepository = avatarRepository;
         this.authorityRepository = authorityRepository;
     }
-/*
-    private User getSingleUser() {
-        if (user == null) {
-            user = new User();
-            user.setId(1);
-            user.setFirstName("Работяга");
-            user.setLastName("Дефолтный");
-            user.setEmail("user@gmail.com");
-            user.setPhone("+79881234567");
-            user.setCity("Сочи");
-            user.setRegDate(LocalDate.now().toString());
-            user.setUserName("User");
-            user.setPassword("password");
-            user.setRole(Role.ADMIN);
-            user = userRepository.save(user);
-        }
-        return user;
-    }
- */
-//todo username added
+
     public UserRecord getUser(String username) {
         return recordMapper.toRecord(userRepository.findByUsername(username));
     }
 
-//todo должен быть второй параметр  - username!
     public NewPassword setPassword(NewPassword newPassword, String username) {
-        User singleUser = userRepository.findByUsername(username);
-        if (singleUser.getPassword().equals(newPassword.getCurrentPassword())) {
-            singleUser.setPassword(newPassword.getNewPassword());
-            userRepository.save(singleUser);
+        User user = userRepository.findByUsername(username);
+        if (user.getPassword().equals(newPassword.getCurrentPassword())) {
+            user.setPassword(newPassword.getNewPassword());
+            userRepository.save(user);
         }
         return newPassword;
     }
@@ -89,7 +67,7 @@ public class UserService {
         Avatar avatar = avatarRepository.findById(avatarId).orElseThrow(AvatarNotFoundException::new);
         return avatarService.getAvatarData(avatar);
     }
-//todo need refactor
+
     public void createUser(RegisterReq registerReq) {
         User newUser = recordMapper.toEntity(registerReq);
         Authority auth = new Authority();
@@ -100,10 +78,6 @@ public class UserService {
     }
 
     public boolean userExists(String username) {
-        if (userRepository.existsUserByUsername(username)) {
-            return true;
-        } else {
-            return false;
-        }
+        return userRepository.existsUserByUsername(username);
     }
 }
