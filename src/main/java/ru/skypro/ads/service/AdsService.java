@@ -1,6 +1,7 @@
 package ru.skypro.ads.service;
 
 import org.springframework.data.util.Pair;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +20,6 @@ import ru.skypro.ads.repository.CommentRepository;
 import ru.skypro.ads.repository.ImageRepository;
 import ru.skypro.ads.repository.UserRepository;
 
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,17 +57,17 @@ public class AdsService {
         }
         return new ResponseWrapperAds(listAdsRecords.size(), listAdsRecords);
     }
-
-    public AdsRecord addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile) {
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
+    public AdsRecord addAds(CreateAdsReq createAdsReq, MultipartFile multipartFile, String username) {
         Ads ads = recordMapper.toEntity(createAdsReq);
-        UserRecord user = userService.getUser();
+        UserRecord user = recordMapper.toRecord(userRepository.findByUsername(username));
         ads.setAuthor(recordMapper.toEntity(user));
         ads = adsRepository.save(ads);
         ads.setImage(imageServiceImpl.addImage(ads, multipartFile));
         ads = adsRepository.save(ads);
         return recordMapper.toRecord(ads);
     }
-
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
     public ResponseWrapperComment getAllCommentsByAdsId(Integer adsId) {
         List<CommentRecord> list = new ArrayList<>();
         Ads ads = adsRepository.findAdsById(adsId);
@@ -79,15 +78,16 @@ public class AdsService {
         }
         return new ResponseWrapperComment(list.size(), list);
     }
-
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
     public FullAdsRecord getFullAds(Integer id) {
         Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
         return recordMapper.toFullAdsRecord(ads);
     }
 
+    @PreAuthorize("@adsService.isAdsAuthor(#adsId, #username) or hasAuthority('ROLE_ADMIN')")
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void deleteAds(Integer id) {
-        Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
+    public void deleteAds(Integer adsId, String username) {
+        Ads ads = adsRepository.findById(adsId).orElseThrow(AdsNotFoundException::new);
         Image image = ads.getImage();
         if (image != null) {
             if (!imageServiceImpl.deleteImage(image)) {
@@ -95,10 +95,11 @@ public class AdsService {
             }
         }
         commentRepository.removeAllByAds(ads);
-        adsRepository.deleteById(id);
+        adsRepository.deleteById(adsId);
     }
 
-    public AdsRecord updateAds(Integer id, CreateAdsReq createAdsReq) {
+    @PreAuthorize("@adsService.isAdsAuthor(#id, #username) or hasAuthority('ROLE_ADMIN')")
+    public AdsRecord updateAds(Integer id, CreateAdsReq createAdsReq, String username) {
         Ads ads = adsRepository.findById(id).orElseThrow(AdsNotFoundException::new);
         Ads newAds = recordMapper.toEntity(createAdsReq);
         ads.setDescription(newAds.getDescription());
@@ -108,18 +109,16 @@ public class AdsService {
         return recordMapper.toRecord(ads);
     }
 
-    public CommentRecord addComment(Integer adsId, CommentRecord commentRecord) {
-        commentRecord.setAdsId(adsId);
-        commentRecord.setAuthorId(userService.getUser().getId());
-        commentRecord.setCreatedAt(LocalDate.now().toString());
-        commentRecord.setPk(1);
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
+    public CommentRecord addComment(Integer adsId, CommentRecord commentRecord, String username) {
         Ads ads = adsRepository.findById(adsId).orElseThrow(AdsNotFoundException::new);
-        User author = userRepository.findById(commentRecord.getAuthorId()).orElseThrow(RuntimeException::new);
+        User author = userRepository.findByUsername(username);
         Comment comment = recordMapper.toEntity(commentRecord, ads, author);
         comment = commentRepository.save(comment);
         return recordMapper.toRecord(comment);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
     public CommentRecord getAdsComment(Integer adPk, Integer commentId) {
         Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
         Comment comment = commentRepository.findCommentByAdsAndId(ads, commentId)
@@ -127,14 +126,17 @@ public class AdsService {
         return recordMapper.toRecord(comment);
     }
 
-    public void deleteComment(Integer adPk, Integer id) {
-        Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
-        if (!commentRepository.deleteByAdsAndId(ads, id)) {
+    @PreAuthorize("@adsService.isCommentAuthor(#id, #username) or hasAuthority('ROLE_ADMIN')")
+    public void deleteComment(Integer adPk, Integer id, String username) {
+        adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
+        if (!commentRepository.existsById(id)) {
             throw new CommentNotFoundException();
         }
+        commentRepository.deleteById(id);
     }
 
-    public CommentRecord updateComment(Integer adPk, Integer id, CommentRecord commentRecord) {
+    @PreAuthorize("@adsService.isCommentAuthor(#id, #username) or hasAuthority('ROLE_ADMIN')")
+    public CommentRecord updateComment(Integer adPk, Integer id, CommentRecord commentRecord, String username) {
         Ads ads = adsRepository.findById(adPk).orElseThrow(AdsNotFoundException::new);
         Comment oldComment = commentRepository.findCommentByAdsAndId(ads, id)
                 .orElseThrow(CommentNotFoundException::new);
@@ -143,17 +145,19 @@ public class AdsService {
         return recordMapper.toRecord(oldComment);
     }
 
-    public Pair<byte[], String> updateAdsImage(Integer idAds, MultipartFile image) {
+    @PreAuthorize("@adsService.isAdsAuthor(#idAds, #username) or hasAuthority('ROLE_ADMIN')")
+    public Pair<byte[], String> updateAdsImage(Integer idAds, MultipartFile image, String username) {
         Ads ads = adsRepository.findById(idAds).orElseThrow(AdsNotFoundException::new);
         Image oldImage = imageRepository.findByAdsId(ads);
         Image newImage = imageServiceImpl.updateImage(ads, oldImage, image);
         return imageServiceImpl.getImageData(newImage);
     }
 
-    public ResponseWrapperAds getAdsMe() {
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN')")
+    public ResponseWrapperAds getAdsMe(String username) {
         List<AdsRecord> list = new ArrayList<>();
 
-        UserRecord userRecord = userService.getUser();
+        UserRecord userRecord = recordMapper.toRecord(userRepository.findByUsername(username));
         User user = recordMapper.toEntity(userRecord);
 
         List<Ads> listAds = adsRepository.findAllByAuthorId(user.getId());
@@ -167,5 +171,14 @@ public class AdsService {
         Image image = imageRepository.findById(uniqId).orElseThrow(ImageNotFoundException::new);
         return imageServiceImpl.getImageData(image);
     }
+
+    public boolean isAdsAuthor(Integer adsId, String username) {
+        return adsRepository.existsByIdAndAuthor_Username(adsId, username);
+    }
+
+    public boolean isCommentAuthor(Integer commentId, String username) {
+        return commentRepository.existsByIdAndAuthor_Username(commentId, username);
+    }
+
 
 }

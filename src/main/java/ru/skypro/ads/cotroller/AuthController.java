@@ -1,5 +1,6 @@
 package ru.skypro.ads.cotroller;
 
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import ru.skypro.ads.dto.RegisterReq;
 import ru.skypro.ads.dto.Role;
 import ru.skypro.ads.service.AuthService;
 
-import static ru.skypro.ads.dto.Role.USER;
+import static ru.skypro.ads.dto.Role.ROLE_USER;
 
 @Slf4j
 @CrossOrigin(value = "http://localhost:3000")
@@ -24,7 +25,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginReq req) {
+    public ResponseEntity<Void> login(@RequestBody LoginReq req) {
         if (authService.login(req.getUsername(), req.getPassword())) {
             return ResponseEntity.ok().build();
         } else {
@@ -33,8 +34,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterReq req) {
-        Role role = req.getRole() == null ? USER : req.getRole();
+    public ResponseEntity<Void> register(@RequestBody RegisterReq req) {
+        Role role = req.getRole() == null ? ROLE_USER : req.getRole();
         if (authService.register(req, role)) {
             return ResponseEntity.ok().build();
         } else {

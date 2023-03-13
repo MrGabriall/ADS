@@ -16,14 +16,14 @@ public class User {
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "username")
+    private String username;
+
     @Column(name = "first_name")
     private String firstName;
 
     @Column(name = "last_name")
     private String lastName;
-
-    @Column(name = "email")
-    private String email;
 
     @Column(name = "phone")
     private String phone;
@@ -34,14 +34,15 @@ public class User {
     @Column(name = "reg_date")
     private String regDate;
 
-    @Column(name = "username")
-    private String userName;
     @Column(name = "password")
     private String password;
 
     @OneToOne
     @JoinColumn(name = "avatar")
     private Avatar avatar;
+
+    @Column(name = "enabled")
+    private boolean enabled;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")

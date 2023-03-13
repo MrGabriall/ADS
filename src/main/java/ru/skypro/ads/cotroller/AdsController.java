@@ -4,17 +4,20 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.dto.*;
 import ru.skypro.ads.service.AdsService;
-import ru.skypro.ads.service.UserService;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
 @RequestMapping("/ads")
 public class AdsController {
     private final AdsService adsService;
+
 
     public AdsController(AdsService adsService) {
         this.adsService = adsService;
@@ -28,8 +31,9 @@ public class AdsController {
     @PostMapping(produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<AdsRecord> addAds(@RequestPart(value = "properties") CreateAdsReq createAdsReq,
-                                            @RequestPart("image") MultipartFile multipartFile) {
-        return ResponseEntity.ok(adsService.addAds(createAdsReq, multipartFile));
+                                            @RequestPart("image") MultipartFile multipartFile,
+                                            Authentication authentication) {
+        return ResponseEntity.ok(adsService.addAds(createAdsReq, multipartFile, authentication.getName()));
     }
 
     @GetMapping(value = "/{ad_pk}/comments",
@@ -42,10 +46,11 @@ public class AdsController {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<CommentRecord> addComments(@PathVariable("ad_pk") Integer adPk,
-                                                     @RequestBody CommentRecord commentRecord) {
-        CommentRecord record = adsService.addComment(adPk, commentRecord);
-        return ResponseEntity.ok(record);
+                                                     @RequestBody CommentRecord commentRecord,
+                                                     Authentication authentication) {
+        return ResponseEntity.ok(adsService.addComment(adPk, commentRecord, authentication.getName()));
     }
+
 
     @GetMapping(value = "/{id}",
             produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -54,8 +59,9 @@ public class AdsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAds(@PathVariable Integer id) {
-        adsService.deleteAds(id);
+    public ResponseEntity<Void> deleteAds(@PathVariable("id") Integer adsId,
+                                          Authentication authentication) {
+        adsService.deleteAds(adsId, authentication.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -63,8 +69,9 @@ public class AdsController {
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<AdsRecord> updateAds(@PathVariable Integer id,
-                                               @RequestBody CreateAdsReq createAdsReq) {
-        return ResponseEntity.ok(adsService.updateAds(id, createAdsReq));
+                                               @RequestBody CreateAdsReq createAdsReq,
+                                               Authentication authentication) {
+        return ResponseEntity.ok(adsService.updateAds(id, createAdsReq, authentication.getName()));
     }
 
     @GetMapping(value = "/{ad_pk}/comments/{id}",
@@ -76,8 +83,9 @@ public class AdsController {
 
     @DeleteMapping("/{ad_pk}/comments/{id}")
     public ResponseEntity<Void> deleteComments(@PathVariable("ad_pk") Integer adPk,
-                                               @PathVariable Integer id) {
-        adsService.deleteComment(adPk, id);
+                                               @PathVariable Integer id,
+                                               Authentication authentication) {
+        adsService.deleteComment(adPk, id, authentication.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -86,23 +94,26 @@ public class AdsController {
             consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<CommentRecord> updateComments(@PathVariable("ad_pk") Integer adPk,
                                                         @PathVariable Integer id,
-                                                        @RequestBody CommentRecord commentRecord) {
-        return ResponseEntity.ok(adsService.updateComment(adPk, id, commentRecord));
+                                                        @RequestBody CommentRecord commentRecord,
+                                                        Authentication authentication) {
+        return ResponseEntity.ok(adsService.updateComment(adPk, id, commentRecord, authentication.getName()));
     }
 
 
     @GetMapping(value = "/me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<ResponseWrapperAds> getAdsMe() {
-        ResponseWrapperAds adsMe = adsService.getAdsMe();
+    public ResponseEntity<ResponseWrapperAds> getAdsMe(Authentication authentication) {
+        ResponseWrapperAds adsMe = adsService.getAdsMe(authentication.getName());
         return ResponseEntity.ok(adsMe);
     }
 
     @PatchMapping(value = "/{id}/image",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE},
             consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<byte[]> updateAdsImage(@PathVariable("id") Integer idAds, @RequestPart("image") MultipartFile image) {
-        Pair<byte[], String> pair = adsService.updateAdsImage(idAds, image);
+    public ResponseEntity<byte[]> updateAdsImage(@PathVariable("id") Integer idAds,
+                                                 @RequestPart("image") MultipartFile image,
+                                                 Authentication authentication) {
+        Pair<byte[], String> pair = adsService.updateAdsImage(idAds, image, authentication.getName());
         return ResponseEntity.ok()
                 .contentLength(pair.getFirst().length)
                 .contentType(MediaType.parseMediaType(pair.getSecond()))

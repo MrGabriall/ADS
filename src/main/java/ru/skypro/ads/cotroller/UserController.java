@@ -5,6 +5,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.skypro.ads.dto.UserRecord;
@@ -22,27 +23,29 @@ public class UserController {
     @PostMapping(path = "/set_password",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<NewPassword> setPassword(@RequestBody NewPassword newPassword) {
-        return new ResponseEntity<>(userService.setPassword(newPassword), HttpStatus.OK);
-
+    public ResponseEntity<NewPassword> setPassword(@RequestBody NewPassword newPassword,
+                                                   Authentication authentication) {
+        return new ResponseEntity<>(userService.setPassword(newPassword, authentication.getName()), HttpStatus.OK);
     }
 
     @GetMapping(path = "/me",
             produces = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<UserRecord> getUser() {
-        return ResponseEntity.ok(userService.getUser());
+    public ResponseEntity<UserRecord> getUser(Authentication authentication) {
+        return ResponseEntity.ok(userService.getUser(authentication.getName()));
     }
 
     @PatchMapping(path = "/me",
             produces = {MediaType.APPLICATION_JSON_VALUE},
             consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<UserRecord> updateUser(@RequestBody UserRecord userRecord) {
-        return new ResponseEntity<>(userService.updateUser(userRecord), HttpStatus.OK);
+    public ResponseEntity<UserRecord> updateUser(@RequestBody UserRecord userRecord,
+                                                 Authentication authentication) {
+        return new ResponseEntity<>(userService.updateUser(userRecord, authentication.getName()), HttpStatus.OK);
     }
 
     @PatchMapping(path = "/me/image", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<Void> updateUserImage(@RequestPart("image") MultipartFile image) {
-        userService.updateUserImage(image);
+    public ResponseEntity<Void> updateUserImage(@RequestPart("image") MultipartFile image,
+                                                Authentication authentication) {
+        userService.updateUserImage(image, authentication.getName());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
