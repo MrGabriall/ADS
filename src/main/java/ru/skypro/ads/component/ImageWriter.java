@@ -5,22 +5,31 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class ImageWriter {
 
     private Path generateFilePath(MultipartFile file, String dir) {
+        File fileExist;
+        String uuid;
+        Path path = Paths.get(dir);
         String date = LocalDate.now().toString();
         String extension = Optional.ofNullable(file.getOriginalFilename())
                 .map(fileName -> fileName.substring(file.getOriginalFilename().lastIndexOf('.')))
                 .orElse("");
-        return Paths.get(dir).resolve(file.getName() + "_" + date + extension);
+        do {
+            uuid = String.valueOf(UUID.randomUUID());
+            fileExist = path.resolve(file.getName() + "_" + uuid + date + extension).toFile();
+        } while (fileExist.exists());
+        return path.resolve(file.getName() + "_" + date + uuid + extension);
     }
 
     public Path writeImage(MultipartFile file, String dir) {

@@ -1,7 +1,6 @@
 package ru.skypro.ads;
 
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -18,12 +17,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
-    @Value("${spring.datasource.username}")
-    private String usernameDB;
-    @Value("${spring.datasource.password}")
-    private String passwordDB;
-    @Value("${spring.datasource.url}")
-    private String jdbcURl;
 
     private static final String[] AUTH_WHITELIST = {
             "/swagger-resources/**",
@@ -33,13 +26,13 @@ public class WebSecurityConfig {
             "/login", "/register",
             "/ads",
             "/ads/*/image",
-            "/users/*/image"
+            "/users/*/image",
+            "/users/me/get_avatar/**"
     };
 
     @Bean
     public JdbcUserDetailsManager users(DataSource dataSource) {
-        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
-        return jdbcUserDetailsManager;
+        return new JdbcUserDetailsManager(dataSource);
     }
 
     @Bean

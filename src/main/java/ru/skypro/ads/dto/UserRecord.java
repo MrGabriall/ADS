@@ -1,5 +1,6 @@
 package ru.skypro.ads.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,5 +16,6 @@ public class UserRecord {
     private String email;
     private String city;
     private String regDate;
+    @JsonProperty("image")
     private String avatarPath;
 }

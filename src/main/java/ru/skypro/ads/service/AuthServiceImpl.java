@@ -3,7 +3,6 @@ package ru.skypro.ads.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import ru.skypro.ads.dto.RegisterReq;
 import ru.skypro.ads.dto.Role;
@@ -14,9 +13,8 @@ import ru.skypro.ads.repository.UserRepository;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private static Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 
-    private final UserDetailsManager manager;
 
     private final PasswordEncoder encoder;
 
@@ -24,9 +22,8 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
 
 
-    public AuthServiceImpl(UserDetailsManager manager, UserService userService, PasswordEncoder encoder,
+    public AuthServiceImpl(UserService userService, PasswordEncoder encoder,
                            UserRepository userRepository) {
-        this.manager = manager;
         this.encoder = encoder;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -39,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
             log.warn("Error. Username: " + username + " doesn't exist.");
             return false;
         }
-        User user  = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username);
         String encryptedPassword = user.getPassword();
 
         if (!encoder.matches(password, encryptedPassword)) {
@@ -53,8 +50,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean register(RegisterReq registerReq, Role role) {
         log.info("Starting process registration: " + registerReq.getUsername());
-        if (!userRepository.existsUserByUsername(registerReq.getUsername())) {
-            log.warn("Error. This username: " +  registerReq.getUsername() + " - is already exist.");
+        if (userRepository.existsUserByUsername(registerReq.getUsername())) {
+            log.warn("Error. This username: " + registerReq.getUsername() + " - is already exist.");
             return false;
         }
         registerReq.setPassword(encoder.encode(registerReq.getPassword()));
