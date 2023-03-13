@@ -86,7 +86,6 @@ public class RecordMapper {
         fullAdsRecord.setPk(ads.getId());
         fullAdsRecord.setTitle(ads.getTitle());
         fullAdsRecord.setPrice(ads.getPrice());
-        //TODO
         fullAdsRecord.setImage(toRecord(ads.getImage()).getImageUrl());
         fullAdsRecord.setDescription(ads.getDescription());
         fullAdsRecord.setAuthorFirstName(ads.getAuthor().getFirstName());
