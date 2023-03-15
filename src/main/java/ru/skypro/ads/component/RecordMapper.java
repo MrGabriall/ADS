@@ -20,7 +20,7 @@ public class RecordMapper {
         user.setRegDate(userRecord.getRegDate());
         if (userRecord.getAvatarPath() != null) {
             Avatar avatar = new Avatar();
-            avatar.setFilePath("src/main/resources/files/avatars/basic_avatar.jpg");
+            avatar.setFilePath(userRecord.getAvatarPath());
             user.setAvatar(avatar);
         }
         return user;
@@ -43,7 +43,6 @@ public class RecordMapper {
 
     public Comment toEntity(CommentRecord commentRecord, Ads ads, User author) {
         Comment comment = new Comment();
-        //comment.setId(commentRecord.getPk());
         comment.setAds(ads);
         comment.setAuthor(author);
         comment.setText(commentRecord.getText());
