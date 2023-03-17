@@ -3,10 +3,12 @@ package ru.skypro.ads.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.skypro.ads.dto.Role;
 
 import javax.persistence.*;
 
+/**
+ * Entity for work with user authority session
+ */
 @Entity
 @Table(name = "authorities")
 @NoArgsConstructor

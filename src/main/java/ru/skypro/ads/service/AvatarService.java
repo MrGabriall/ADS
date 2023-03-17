@@ -19,11 +19,22 @@ public class AvatarService {
     private final AvatarRepository avatarRepository;
     private final ImageWriter imageWriter;
 
+    /**
+     *
+     * @param avatarRepository
+     * @param imageWriter
+     */
     public AvatarService(AvatarRepository avatarRepository, ImageWriter imageWriter) {
         this.avatarRepository = avatarRepository;
         this.imageWriter = imageWriter;
     }
 
+    /**
+     *
+     * @param avatar
+     * @param file
+     * @return
+     */
     public Avatar updateAvatar(Avatar avatar, MultipartFile file) {
         if (avatar != null) {
             checkImage(avatar);
@@ -32,15 +43,30 @@ public class AvatarService {
         return addAvatar(avatar, file);
     }
 
+    /**
+     *
+     * @param avatar
+     * @return
+     */
     public Pair<byte[], String> getAvatarData(Avatar avatar) {
         checkImage(avatar);
         return imageWriter.getImage(avatar.getFilePath());
     }
 
+    /**
+     *
+     * @param avatar
+     */
     private void deleteAvatarInFS(Avatar avatar) {
         imageWriter.deleteImage(Path.of(avatar.getFilePath()));
     }
 
+    /**
+     *
+     * @param avatar
+     * @param file
+     * @return
+     */
     public Avatar addAvatar(Avatar avatar, MultipartFile file) {
         Path path = imageWriter.writeImage(file, avatarsDir);
         if (avatar == null) {
@@ -50,6 +76,10 @@ public class AvatarService {
         return avatarRepository.save(avatar);
     }
 
+    /**
+     *
+     * @param avatar
+     */
     private void checkImage(Avatar avatar) {
         if (avatar.getId() == null || avatarRepository.findById(avatar.getId()).isEmpty()) {
             throw new AvatarNotFoundException();

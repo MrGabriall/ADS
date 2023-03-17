@@ -5,6 +5,9 @@ import ru.skypro.ads.dto.Role;
 
 import javax.persistence.*;
 
+/**
+ * Entity for work with user
+ */
 @Entity
 @Table(name = "users")
 @NoArgsConstructor

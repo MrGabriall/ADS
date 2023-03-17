@@ -4,6 +4,9 @@ import lombok.*;
 
 import javax.persistence.*;
 
+/**
+ * Entity for work with comment
+ */
 @Entity
 @Table(name = "comments")
 @NoArgsConstructor

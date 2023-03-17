@@ -4,6 +4,9 @@ import lombok.*;
 
 import javax.persistence.*;
 
+/**
+ * Entity for work with avatar
+ */
 @Entity
 @Table(name = "avatars")
 @NoArgsConstructor

@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO for display full ads info
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

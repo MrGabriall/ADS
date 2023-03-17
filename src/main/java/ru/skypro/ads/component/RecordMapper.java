@@ -7,6 +7,9 @@ import ru.skypro.ads.entity.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * This class mapping dto and entity
+ */
 @Component
 public class RecordMapper {
 

@@ -7,6 +7,9 @@ import lombok.NonNull;
 
 import java.util.List;
 
+/**
+ * DTO for display list comments
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

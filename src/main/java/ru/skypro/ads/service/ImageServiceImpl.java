@@ -27,6 +27,13 @@ public class ImageServiceImpl {
         this.imageWriter = imageWriter;
     }
 
+    /**
+     *
+     * @param ads
+     * @param image
+     * @param file
+     * @return
+     */
     public Image updateImage(Ads ads, Image image, MultipartFile file) {
         if (image != null) {
             checkImage(image);
@@ -35,11 +42,21 @@ public class ImageServiceImpl {
         return addImage(ads, file);
     }
 
+    /**
+     *
+     * @param image
+     * @return
+     */
     public Pair<byte[], String> getImageData(Image image) {
         checkImage(image);
         return imageWriter.getImage(image.getFilePath());
     }
 
+    /**
+     *
+     * @param image
+     * @return
+     */
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean deleteImage(Image image) {
         imageRepository.delete(image);
@@ -47,6 +64,12 @@ public class ImageServiceImpl {
         return isDeleted && imageRepository.findById(image.getId()).isEmpty();
     }
 
+    /**
+     *
+     * @param ads
+     * @param file
+     * @return
+     */
     public Image addImage(Ads ads, MultipartFile file) {
         Path path = imageWriter.writeImage(file, imagesDir);
 
@@ -57,6 +80,10 @@ public class ImageServiceImpl {
         return image;
     }
 
+    /**
+     *
+     * @param image
+     */
     private void checkImage(Image image) {
         if (image.getId() == null || imageRepository.findById(image.getId()).isEmpty()) {
             throw new ImageNotFoundException();

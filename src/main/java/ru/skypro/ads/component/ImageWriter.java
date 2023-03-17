@@ -14,9 +14,21 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * @author mrgab
+ *
+ * This class work with multipart files in file system
+ */
 @Component
 public class ImageWriter {
 
+    /**
+     * This method generate file path with random name for multipart file
+     *
+     * @param file
+     * @param dir
+     * @return Path for new file in file system
+     */
     private Path generateFilePath(MultipartFile file, String dir) {
         File fileExist;
         String uuid;
@@ -32,6 +44,13 @@ public class ImageWriter {
         return path.resolve(file.getName() + "_" + date + uuid + extension);
     }
 
+    /**
+     * This method write multipart file in file system
+     *
+     * @param file
+     * @param dir
+     * @return path in file system
+     */
     public Path writeImage(MultipartFile file, String dir) {
         Path path = generateFilePath(file, dir);
         try {
@@ -41,6 +60,12 @@ public class ImageWriter {
         }
     }
 
+    /**
+     * This method delete image in file system
+     *
+     * @param path
+     * @return result of delete
+     */
     public boolean deleteImage(Path path) {
         try {
             return Files.deleteIfExists(path);
@@ -49,6 +74,12 @@ public class ImageWriter {
         }
     }
 
+    /**
+     * This method get pair for get image data
+     *
+     * @param path
+     * @return byte[] and media type
+     */
     public Pair<byte[], String> getImage(String path) {
         byte[] bytes;
         try {

@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO for work with register request
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

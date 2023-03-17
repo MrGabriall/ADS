@@ -4,6 +4,9 @@ import lombok.*;
 
 import javax.persistence.*;
 
+/**
+ * Entity for work with ads image
+ */
 @Entity
 @Table(name = "images")
 @NoArgsConstructor

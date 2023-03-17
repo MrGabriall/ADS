@@ -7,6 +7,10 @@ import lombok.NoArgsConstructor;
 import ru.skypro.ads.entity.Ads;
 
 import java.util.List;
+
+/**
+ * DTO for display list ads
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

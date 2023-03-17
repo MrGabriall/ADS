@@ -9,7 +9,9 @@ import ru.skypro.ads.dto.Role;
 import ru.skypro.ads.entity.User;
 import ru.skypro.ads.repository.UserRepository;
 
-
+/**
+ * Class for work with authorisation
+ */
 @Service
 public class AuthServiceImpl implements AuthService {
     private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
@@ -25,6 +27,14 @@ public class AuthServiceImpl implements AuthService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Method for login, check user in db
+     * Password check work with encrypted password and encoder matches
+     *
+     * @param username
+     * @param password
+     * @return boolean
+     */
     @Override
     public boolean login(String username, String password) {
         if (!userService.userExists(username)) {
@@ -41,6 +51,14 @@ public class AuthServiceImpl implements AuthService {
         return true;
     }
 
+    /**
+     * Method for register, save user in db
+     * Password save with encryption
+     *
+     * @param registerReq
+     * @param role
+     * @return
+     */
     @Override
     public boolean register(RegisterReq registerReq, Role role) {
         if (userRepository.existsUserByUsername(registerReq.getUsername())) {
