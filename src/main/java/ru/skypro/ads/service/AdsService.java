@@ -127,6 +127,7 @@ public class AdsService {
             if (!imageServiceImpl.deleteImage(image)) {
                 throw new ImageNotFoundException();
             }
+            imageServiceImpl.deleteImage(image);
         }
         commentRepository.removeAllByAds(ads);
         adsRepository.deleteById(adsId);

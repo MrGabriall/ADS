@@ -59,12 +59,3 @@ CREATE TABLE authorities
     username  VARCHAR(30)   NOT NULL UNIQUE,
     authority VARCHAR(30)   NOT NULL
 );
-
-
-
-
-
---INSERT INTO users (id, email, username, password, first_name, last_name, phone, reg_date, enabled)
-    --VALUES('0', 'user@gmail.com','$2a$10$cRqfrdolNVFW6sAju0eNEOE0VC29aIyXwfsEsY2Fz2axy3MnH8ZGa', 'user', 'userovich', '+79819696543', '2023-06-04',1);
---INSERT INTO users (id, email, username, password, first_name, last_name, phone, reg_date, enabled)
-    --VALUES('1', 'vsevolod_sol@mail.ru', '$2a$10$cRqfrdolNVFW6sAju0eNEOE0VC29aIyXwfsEsY2Fz2axy3MnH8ZGa','seva', 'valerievich', '+79819653355', '2023-06-04', 1);

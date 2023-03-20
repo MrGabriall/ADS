@@ -120,7 +120,7 @@ public class RecordMapper {
         user.setLastName(registerReq.getLastName());
         user.setPhone(registerReq.getPhone());
         user.setPassword(registerReq.getPassword());
-        user.setRole(registerReq.getRole());
+        user.setRole(Role.ROLE_USER);
         user.setRegDate(LocalDate.now().toString());
         user.setEnabled(true);
         return user;
